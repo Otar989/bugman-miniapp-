@@ -2,18 +2,14 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Bugman — Telegram Mini App</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="brand">
-      <div class="dot"></div>
-      <h1>Bugman</h1>
-    </div>
+    <div class="brand"><div class="dot"></div><h1>Bugman</h1></div>
     <div class="hud">
       <div class="chip"><span class="dot"></span> Очки: <span id="score">0</span></div>
       <div class="chip"><span class="dot"></span> Уровень: <span id="level">1</span></div>
@@ -21,50 +17,36 @@
       <button id="btnPause" class="btn">Пауза ⏸</button>
       <button id="btnRestart" class="btn">Заново ↻</button>
       <button id="btnSound" class="btn">Звук 🔊</button>
-      <button id="btnMusic" class="btn">Мелодия ♫</button>
+      <button id="btnMusic" class="btn">Мелодия ⏹</button>
     </div>
   </header>
 
   <main id="game">
-    <canvas id="canvas" width="672" height="744"
-            tabindex="0" aria-label="Игровое поле Bugman"></canvas>
+    <canvas id="canvas" width="672" height="744" tabindex="0" aria-label="Игровое поле Bugman"></canvas>
   </main>
 
   <section class="controls">
     <div class="pad" aria-label="Виртуальный джойстик">
-      <div class="empty"></div>
-      <div class="pbtn" data-dir="up">▲</div>
-      <div class="empty"></div>
-
-      <div class="pbtn" data-dir="left">◀</div>
-      <div class="pbtn" data-dir="down">▼</div>
-      <div class="pbtn" data-dir="right">▶</div>
-
-      <div class="empty"></div>
-      <div class="empty"></div>
-      <div class="empty"></div>
+      <div class="empty"></div><div class="pbtn" data-dir="up">▲</div><div class="empty"></div>
+      <div class="pbtn" data-dir="left">◀</div><div class="pbtn" data-dir="down">▼</div><div class="pbtn" data-dir="right">▶</div>
+      <div class="empty"></div><div class="empty"></div><div class="empty"></div>
     </div>
   </section>
 
-  <div class="legend">
-    Полная карта без «мертвых» зон. Стрелки и свайпы. Выход за край — вход с противоположного края.
-  </div>
-
+  <div class="legend">Стрелки и свайпы. Выход за край — вход с противоположного края.</div>
   <footer>© 2025 — Bugman.</footer>
 </div>
 
 <div class="start" id="start">
   <div class="card">
     <p class="title">Нажми «Начать»</p>
-    <p class="sub">Активируются звук/музыка и управление с клавиатуры.</p>
+    <p class="sub">Активируются звук/музыка и управление.</p>
     <button id="btnStart" class="btn">Начать ▶</button>
   </div>
 </div>
 
-<!-- Telegram Mini App SDK -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-  // Нативный вид в Telegram Mini App
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
@@ -75,7 +57,6 @@
     Telegram.WebApp.BackButton.show();
   }
 </script>
-
 <script defer src="game.js"></script>
 </body>
 </html>
