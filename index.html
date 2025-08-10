@@ -6,17 +6,15 @@
 <title>Bugman — Telegram Mini App</title>
 <style>
   :root{
-    --bg:#070b16;
-    --panel:#0f1629;
-    --accent:#ffd23f;
-    --text:#e6f0ff;
-    --muted:#8aa0c6;
-    --neon:#4a6dff;
+    --bg:#070b16; --panel:#0f1629; --accent:#ffd23f; --text:#e6f0ff; --muted:#8aa0c6; --neon:#4a6dff;
   }
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(1200px 500px at 70% -10%, #14264d 0%, #0a1124 55%, #070b16 100%)}
+  html,body{height:100%;margin:0;color:var(--text);
+    font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+    background:radial-gradient(1200px 500px at 70% -10%, #14264d 0%, #0a1124 55%, #070b16 100%)}
   .wrap{display:grid;grid-template-rows:auto 1fr auto;min-height:100%}
-  header{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:10px 14px;background:linear-gradient(180deg,var(--panel),#0c1324);border-bottom:1px solid #172344;position:sticky;top:0;z-index:5}
+  header{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:10px 14px;
+    background:linear-gradient(180deg,var(--panel),#0c1324);border-bottom:1px solid #172344;position:sticky;top:0;z-index:5}
   .brand{display:flex;gap:10px;align-items:center}
   .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px 6px rgba(255,210,63,.6)}
   h1{font-size:16px;letter-spacing:.8px;margin:0;font-weight:800}
@@ -24,19 +22,15 @@
   .chip{background:#0b1430;border:1px solid #1b2c56;border-radius:999px;padding:6px 10px;display:flex;align-items:center;gap:8px;font-weight:700}
   .chip .dot{width:8px;height:8px;border-radius:50%;background:#2b3f72;box-shadow:0 0 10px rgba(43,63,114,.6) inset}
   #game{display:grid;place-items:center;padding:12px}
-  canvas{width:min(96vw,900px);height:calc(min(96vw,900px)*.9);max-height:78vh;background:#020817;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.45), inset 0 0 0 3px #0e1a36;outline:none;touch-action:none}
+  canvas{width:min(96vw,900px);height:calc(min(96vw,900px)*.9);max-height:78vh;background:#020817;border-radius:18px;
+    box-shadow:0 12px 40px rgba(0,0,0,.45), inset 0 0 0 3px #0e1a36;outline:none;touch-action:none}
   .controls{display:flex;align-items:center;justify-content:center;gap:14px;padding:10px;flex-wrap:wrap}
   .btn{appearance:none;border:1px solid #1b2c56;background:#0b1430;color:var(--text);padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.2s;box-shadow:0 6px 16px rgba(0,0,0,.25)}
   .btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.35)}
   .legend{padding:0 14px 14px;color:var(--muted);text-align:center;font-size:12px}
-  .pad{display:grid;grid-template-columns:60px 60px 60px;grid-template-rows:60px 60px 60px;gap:8px;touch-action:none}
-  .pad .pbtn{width:60px;height:60px;border-radius:18px;background:#0b1430;border:1px solid #1b2c56;display:grid;place-items:center;font-weight:800;user-select:none}
-  .pad .pbtn:active{box-shadow:0 0 0 3px #1b2c56 inset}
-  .pad .empty{background:transparent;border:none}
-  @media (min-width:900px){.pad{display:none}}
   footer{padding:10px 14px;color:#8aa0c6;text-align:center;font-size:12px}
   .start{position:fixed;inset:0;display:grid;place-items:center;background:rgba(3,6,14,.7);backdrop-filter:blur(3px);z-index:9}
-  .card{background:rgba(12,22,52,.95);border:1px solid #244;box-shadow:0 20px 60px rgba(0,0,0,.5);border-radius:18px;padding:20px;max-width:540px;text-align:center}
+  .card{background:rgba(12,22,52,.95);border:1px solid #244;box-shadow:0 20px 60px rgba(0,0,0,.5);border-radius:18px;padding:20px;max-width:520px;text-align:center}
   .title{font-weight:900;font-size:28px;margin:0 0 6px}
   .sub{color:#a9b9df;margin:0 0 14px}
 </style>
@@ -60,21 +54,7 @@
     <canvas id="canvas" width="672" height="744" tabindex="0" aria-label="Игровое поле Bugman"></canvas>
   </main>
 
-  <section class="controls">
-    <div class="pad" aria-label="Виртуальный джойстик">
-      <div class="empty"></div>
-      <div class="pbtn" data-dir="up">▲</div>
-      <div class="empty"></div>
-      <div class="pbtn" data-dir="left">◀</div>
-      <div class="pbtn" data-dir="down">▼</div>
-      <div class="pbtn" data-dir="right">▶</div>
-      <div class="empty"></div>
-      <div class="empty"></div>
-      <div class="empty"></div>
-    </div>
-  </section>
-  <div class="legend">Стрелки и свайпы. Выход за край — вход с противоположного края.</div>
-
+  <div class="legend">Стрелки, WASD и свайпы/флики. Выход за край — вход с противоположного.</div>
   <footer>© 2025 — Bugman.</footer>
 </div>
 
@@ -87,264 +67,316 @@
 </div>
 
 <script>
-/* ================== CANVAS & AUDIO ================== */
+/* =================== CANVAS & SCALES =================== */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 let DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-function fitCanvas(){ const w = 28*24, h = 31*24; canvas.width = w * DPR; canvas.height = h * DPR; canvas.style.aspectRatio = `${w}/${h}`; ctx.setTransform(DPR,0,0,DPR,0,0);} fitCanvas(); addEventListener('resize', fitCanvas);
+function fitCanvas(){
+  const w = 28*24, h = 31*24;
+  canvas.width = w * DPR; canvas.height = h * DPR;
+  canvas.style.aspectRatio = `${w}/${h}`;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+fitCanvas(); addEventListener('resize', fitCanvas);
 
-let audioEnabled = true; let audioCtx, master, musicGain, sfxGain, musicInterval, musicOn = true; // музыка по умолчанию ВКЛ
-const SOUND = { chomp:{freq:600,dur:0.06}, power:{freq:220,dur:0.25}, eatGhost:{freq:150,dur:0.22}, deathA:{freq:80,dur:0.6}, deathB:{freq:50,dur:0.6}, start:{freq:880,dur:0.15} };
-function ensureAudio(){ if(!audioCtx){ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); master=audioCtx.createGain(); master.gain.value=0.8; sfxGain=audioCtx.createGain(); sfxGain.gain.value=0.9; musicGain=audioCtx.createGain(); musicGain.gain.value=0.35; sfxGain.connect(master); musicGain.connect(master); master.connect(audioCtx.destination);} }
-function playTone({freq,dur}, type='sine', gainNode=sfxGain){ if(!audioEnabled) return; ensureAudio(); const now=audioCtx.currentTime; const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type=type; o.frequency.setValueAtTime(freq,now); g.gain.setValueAtTime(0.001,now); g.gain.linearRampToValueAtTime(0.18,now+0.01); g.gain.exponentialRampToValueAtTime(0.001,now+dur); o.connect(g).connect(gainNode); o.start(now); o.stop(now+dur+0.02); }
-/* новая мелодия — простой минорный мотив */
-const MELODY=[{n:440,t:.22},{n:523.25,t:.16},{n:659.25,t:.18},{n:587.33,t:.18},{n:0,t:.08},{n:392,t:.20},{n:523.25,t:.18},{n:587.33,t:.24},{n:0,t:.10},{n:392,t:.20},{n:440,t:.20},{n:523.25,t:.24}];
-function startMusic(){ ensureAudio(); stopMusic(); if(!musicOn) return; let i=0; musicInterval=setInterval(()=>{ if(!musicOn) return; const step=MELODY[i%MELODY.length]; if(step.n>0){ const now=audioCtx.currentTime; const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(step.n,now); g.gain.setValueAtTime(0.001,now); g.gain.linearRampToValueAtTime(0.10,now+0.02); g.gain.exponentialRampToValueAtTime(0.001,now+step.t); o.connect(g).connect(musicGain); o.start(now); o.stop(now+step.t+0.05);} i++; }, 220); }
-function stopMusic(){ musicOn && clearInterval(musicInterval); }
+/* =================== AUDIO =================== */
+let audioEnabled = true, audioCtx, master, musicGain, sfxGain, musicSeq, musicOn=false;
+function ensureAudio(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    master=audioCtx.createGain(); master.gain.value=0.8;
+    sfxGain=audioCtx.createGain(); sfxGain.gain.value=0.9;
+    musicGain=audioCtx.createGain(); musicGain.gain.value=0.38;
+    sfxGain.connect(master); musicGain.connect(master); master.connect(audioCtx.destination);
+  }
+}
+function tone(freq, dur, type='sine', gainNode=sfxGain){
+  if(!audioEnabled) return;
+  ensureAudio();
+  const now=audioCtx.currentTime;
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,now);
+  g.gain.setValueAtTime(0.001,now);
+  g.gain.linearRampToValueAtTime(0.18,now+0.02);
+  g.gain.exponentialRampToValueAtTime(0.001,now+dur);
+  o.connect(g).connect(gainNode); o.start(now); o.stop(now+dur+0.03);
+}
+const SFX = { chomp:[620,0.05,'triangle'], power:[230,0.25,'sawtooth'], eat:[160,0.22,'square'], die1:[100,0.5,'square'], die2:[60,0.5,'sine'], start:[880,0.15,'triangle'] };
 
-/* ================== LEVEL & ENTITIES ================== */
-const LEVELS=[[
-"1111111111111111111111111111","1............11............1","1.1111.11111.11.11111.1111.1","1.3..1.3...1.11.1...3.1..3.1","1.1111.11111.11.11111.1111.1","1..22..................22..1","1.1111.11.11111111.11.1111.1","1.1111.11.11111111.11.1111.1","1......11....11....11......1","11111. 11111 11 11111 .11111","00001. 11111 11 11111 .10000","00001. 11          11 .10000","11111. 11 111--111 11 .11111","     .    1G B P1    .     ","11111. 11 11111111 11 .11111","00001. 11    22    11 .10000","00001. 11 11111111 11 .10000","11111. 11 11    11 11 .11111","1............11............1","1.1111.11111.11.11111.1111.1","1.3..1.....1.11.1.....1..3.1","1..11.11111.11.11111.11..3.1","1..22..................22..1","1.111111111111111111111111.1","1..........................1","1.1111111111.11.1111111111.1","1.3......................3.1","1.1111111111.11.1111111111.1","1............11............1","1..........................1","1111111111111111111111111111"]];
+const NEW_THEME = [
+  // лёгкий «итальянский» вальсовый мотив, небуквальная цитата
+  {n:523,t:0.22},{n:659,t:0.22},{n:698,t:0.22},{n:784,t:0.30},
+  {n:0,t:0.06},
+  {n:587,t:0.22},{n:659,t:0.22},{n:740,t:0.22},{n:880,t:0.30},
+  {n:0,t:0.10},
+  {n:659,t:0.22},{n:698,t:0.22},{n:784,t:0.22},{n:988,t:0.34},
+];
+function startMusic(){
+  ensureAudio(); stopMusic(); musicOn=true;
+  let i=0; musicSeq=setInterval(()=>{
+    if(!musicOn) return;
+    const s=NEW_THEME[i%NEW_THEME.length];
+    if(s.n>0){
+      const now=audioCtx.currentTime;
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type='square'; o.frequency.setValueAtTime(s.n,now);
+      g.gain.setValueAtTime(0.001,now);
+      g.gain.linearRampToValueAtTime(0.12,now+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,now+s.t);
+      o.connect(g).connect(musicGain); o.start(now); o.stop(now+s.t+0.05);
+    }
+    i++;
+  }, 210);
+}
+function stopMusic(){ musicOn=false; if(musicSeq) clearInterval(musicSeq); }
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) stopMusic(); });
+
+/* =================== LEVEL & GRID =================== */
 const TILE=24, ROWS=31, COLS=28;
 const DIRS={left:{x:-1,y:0},right:{x:1,y:0},up:{x:0,y:-1},down:{x:0,y:1}};
-const DIR_KEYS={"ArrowLeft":"left","ArrowRight":"right","ArrowUp":"up","ArrowDown":"down"};
-const REVERSE={left:'right',right:'left',up:'down',down:'up'};
+const DIR_KEYS={"ArrowLeft":"left","ArrowRight":"right","ArrowUp":"up","ArrowDown":"down","a":"left","d":"right","w":"up","s":"down"};
+const START_POS={x:14, y:23}; // центр коридора
 
-let levelIndex=0, grid=[], pellets=0, score=0, lives=3, paused=true, frightenedTimer=0, tick=0, scatterTimer=0, inScatter=false;
-const pacman={x:14,y:23,dir:'left',nextDir:'left',speed:0.1,alive:true};
-
-/* Призраки с «личностями» */
-const ghosts=[
-  {name:'Blinky',color:'#ff4b5c',x:13,y:14,dir:'left',speed:0.09, corner:[1,1],   offset:[0,0]},     // преследует позицию
-  {name:'Pinky', color:'#ff7ad9',x:14,y:14,dir:'right',speed:0.085,corner:[COLS-2,1], offset:[-4,0]}, // целит вперёд
-  {name:'Inky',  color:'#00d1d1',x:13,y:15,dir:'up',speed:0.085,  corner:[1,ROWS-2],  offset:[2,2]},  // чуть вперёд‑вниз
-  {name:'Clyde', color:'#ffb84d',x:14,y:15,dir:'down',speed:0.08, corner:[COLS-2,ROWS-2],offset:[0,4]} // любит юг
+// 1 = стена, . = путь с точками, o = большие точки, ' ' = пусто
+const RAW_LEVEL = [
+"1111111111111111111111111111",
+"1............11............1",
+"1.1111.11111.11.11111.1111.1",
+"1....1.....1.11.1.....1....1",
+"1.1111.11111.11.11111.1111.1",
+"1.o.. .............. ....o.1",
+"1.1111.11.11111111.11.1111.1",
+"1.1111.11.11111111.11.1111.1",
+"1......11....11....11......1",
+"11111. 11111 11 11111 .11111",
+"00001. 11111 11 11111 .10000",
+"00001. 11          11 .10000",
+"11111. 11 111--111 11 .11111",
+"     .    1G B P1    .     ",
+"11111. 11 11111111 11 .11111",
+"00001. 11    00    11 .10000",
+"00001. 11 11111111 11 .10000",
+"11111. 11 11    11 11 .11111",
+"1............11............1",
+"1.1111.11111.11.11111.1111.1",
+"1....1.....1.11.1.....1....1",
+"1..11.11111.11.11111.11.. .1",
+"1.o.. .............. ....o.1",
+"1.111111111111111111111111.1",
+"1..........................1",
+"1.1111111111.11.1111111111.1",
+"1.... .......... ..........1",
+"1.1111111111.11.1111111111.1",
+"1............11............1",
+"1..........................1",
+"1111111111111111111111111111"
 ];
 
-/* ======= построение и корректный старт в проходе ======= */
-function buildLevel(){
-  pellets=0;
-  const raw=LEVELS[levelIndex];
-  grid=Array.from({length:ROWS},(_,r)=>Array.from({length:COLS},(_,c)=>{
-    const ch=(raw[r]||'')[c]||' ';
-    if(ch==='1') return 1;
-    if(ch==='3'){pellets++; return 3;}
-    return 0;
+// грид: 1 — стена, 2 — точка, 3 — большая точка, 0 — пусто (проход)
+let grid=[], pellets=0;
+function buildGrid() {
+  grid = Array.from({length:ROWS}, (_,r)=>Array.from({length:COLS}, (_,c)=>{
+    const ch = (RAW_LEVEL[r]||'')[c]||' ';
+    if (ch==='1') return 1;
+    if (ch==='o') return 3;
+    if (ch==='.') return 2;
+    return 0; // проход без точки
   }));
-  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-    if(grid[r][c]===0 && !((r>=11&&r<=16)&&(c>=10&&c<=17))){ grid[r][c]=2; pellets++; }
-  }
-  for(const [r,c] of [[1,1],[1,COLS-2],[ROWS-2,1],[ROWS-2,COLS-2]]){
-    if(grid[r][c]!==1){ if(grid[r][c]===2) pellets--; grid[r][c]=3; pellets++; }
-  }
 
-  function pickStart(){
-    const rowsToTry = [23,22,24,19,17];
-    for(const y of rowsToTry){
-      for(let x=2;x<COLS-2;x++){
-        const here = grid[y][x]!==1;
-        const leftFree  = grid[y][x-1]!==1;
-        const rightFree = grid[y][x+1]!==1;
-        if(here && leftFree && rightFree) return {x,y,dir:'left'};
+  // BFS от старта — оставляем точки только на достижимых клетках
+  const vis=Array.from({length:ROWS},()=>Array(COLS).fill(false));
+  const q=[[START_POS.x, START_POS.y]];
+  vis[START_POS.y][START_POS.x]=true;
+  while(q.length){
+    const [x,y]=q.shift();
+    for(const d of Object.values(DIRS)){
+      const nx=x+d.x, ny=y+d.y;
+      if(nx>=0&&nx<COLS&&ny>=0&&ny<ROWS && !vis[ny][nx] && grid[ny][nx]!==1){
+        vis[ny][nx]=true; q.push([nx,ny]);
       }
     }
-    return {x:14,y:23,dir:'left'};
   }
-  const s = pickStart();
-  Object.assign(pacman,{x:s.x,y:s.y,dir:s.dir,nextDir:s.dir,speed:0.1,alive:true});
-
-  [[13,14,'left'],[14,14,'right'],[13,15,'up'],[14,15,'down']]
-    .forEach((v,i)=>{ghosts[i].x=v[0]; ghosts[i].y=v[1]; ghosts[i].dir=v[2];});
-
-  frightenedTimer=0; scatterTimer=0; inScatter=false;
-}
-
-function updateHUD(){ score=score|0; document.getElementById('score').textContent=score; document.getElementById('lives').textContent=Math.max(0,lives); document.getElementById('level').textContent=levelIndex+1; }
-function isWallTile(x,y){ return grid[y] && grid[y][x]===1; }
-function canMoveFrom(x,y,dir){ const nx=x+DIRS[dir].x, ny=y+DIRS[dir].y; if(nx<0||nx>=COLS||ny<0||ny>=ROWS) return true; return !isWallTile(nx,ny); }
-
-/* корректный шаг: центрируемся на тайле при столкновении */
-function stepActor(a){
-  let x=a.x, y=a.y;
-  const cx=Math.round(x), cy=Math.round(y);
-  const centered=Math.abs(x-cx)<0.05 && Math.abs(y-cy)<0.05;
-
-  if(centered && a.nextDir && canMoveFrom(cx,cy,a.nextDir)) a.dir=a.nextDir;
-
-  // предварительная проверка следующей клетки
-  const nxTry = x+DIRS[a.dir].x*a.speed, nyTry = y+DIRS[a.dir].y*a.speed;
-  const tx=Math.round(nxTry), ty=Math.round(nyTry);
-  if((tx!==cx||ty!==cy) && tx>=0&&tx<COLS&&ty>=0&&ty<ROWS && isWallTile(tx,ty)){
-    // упираемся — встаём ровно по центру текущего тайла, без «продавливания»
-    a.x=cx; a.y=cy;
-  } else {
-    // торы по краям
-    let nx=nxTry, ny=nyTry;
-    if(nx<-0.51) nx=COLS-0.51; if(nx>COLS-0.49) nx=-0.49;
-    if(ny<-0.51) ny=ROWS-0.51; if(ny>ROWS-0.49) ny=-0.49;
-    a.x=nx; a.y=ny;
+  pellets=0;
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    if((grid[r][c]===2||grid[r][c]===3) && !vis[r][c]) grid[r][c]=0;
+    if(grid[r][c]===2||grid[r][c]===3) pellets++;
   }
 }
 
-/* ======= ИИ призраков: scatter/chase + разнообразие ======= */
-function chooseDirAtIntersection(g, options){
-  // не разворачиваемся без крайней нужды
-  const notBack = options.filter(d=>REVERSE[g.dir]!==d);
-  let opts = notBack.length ? notBack : options;
+/* =================== GAME STATE =================== */
+let levelIndex=0, score=0, lives=3, paused=false, frightenedTimer=0, tick=0;
 
-  // маленькая случайность
-  if(Math.random()<0.08) return opts[Math.floor(Math.random()*opts.length)];
+const pacman={x:START_POS.x, y:START_POS.y, dir:'left', nextDir:'left', speed:0.14, alive:true}; // быстрее
+const ghosts=[
+  {name:'Blinky',color:'#ff4b5c',x:13,y:14,dir:'left',speed:0.12,scatter:{x:COLS-2,y:1}},
+  {name:'Pinky', color:'#ff7ad9',x:14,y:14,dir:'right',speed:0.115,scatter:{x:1,y:1}},
+  {name:'Inky',  color:'#00d1d1',x:13,y:15,dir:'up',speed:0.115,scatter:{x:COLS-2,y:ROWS-2}},
+  {name:'Clyde', color:'#ffb84d',x:14,y:15,dir:'down',speed:0.11,scatter:{x:1,y:ROWS-2}},
+];
+let mode='chase', modeTimer=0; // scatter/chase переключение
 
-  // лёгкое «рассыпание»: избегаем скопления
-  const repel = (d)=>{
-    const nx = Math.round(g.x)+DIRS[d].x;
-    const ny = Math.round(g.y)+DIRS[d].y;
-    let penalty=0;
-    for(const other of ghosts){
-      if(other===g) continue;
-      const dx = (other.x - nx), dy = (other.y - ny);
-      const dist2 = dx*dx+dy*dy;
-      if(dist2 < 4) penalty += (4 - dist2); // чем ближе — тем хуже
-    }
-    return penalty;
-  };
-
-  // цель в зависимости от режима
-  let targetX, targetY;
-  if(inScatter){
-    [targetX,targetY] = g.corner;
-  } else {
-    // преследуем с индивидуальным оффсетом
-    targetX = Math.round(pacman.x) + g.offset[0];
-    targetY = Math.round(pacman.y) + g.offset[1];
-  }
-
-  // выбираем направление, минимизирующее расстояние + штраф за скучение
-  let best=opts[0], bestScore=1e9;
-  for(const d of opts){
-    const nx = Math.round(g.x)+DIRS[d].x;
-    const ny = Math.round(g.y)+DIRS[d].y;
-    const dx = targetX - nx, dy = targetY - ny;
-    const dist = dx*dx + dy*dy;
-    const score = dist + repel(d);
-    if(score < bestScore){ bestScore=score; best=d; }
-  }
-  return best;
+function resetActors(){
+  Object.assign(pacman,{x:START_POS.x,y:START_POS.y,dir:'left',nextDir:'left',alive:true});
+  [[13,14,'left'],[14,14,'right'],[13,15,'up'],[14,15,'down']].forEach((v,i)=>{ghosts[i].x=v[0]; ghosts[i].y=v[1]; ghosts[i].dir=v[2];});
+  frightenedTimer=0; mode='chase'; modeTimer=0;
 }
 
-function ghostAI(g){
-  // испуг — блуждаем
+/* =================== HELPERS =================== */
+function atCenter(a){ return Math.abs(a.x-Math.round(a.x))<1e-6 && Math.abs(a.y-Math.round(a.y))<1e-6; }
+function isWall(x,y){ return grid[y] && grid[y][x]===1; }
+function tileFree(x,y){ return x>=0&&x<COLS&&y>=0&&y<ROWS && !isWall(x,y); }
+function forwardTile(a){ const cx=Math.round(a.x), cy=Math.round(a.y); return {tx:cx+DIRS[a.dir].x, ty:cy+DIRS[a.dir].y}; }
+function canTurn(a, dir){ const cx=Math.round(a.x), cy=Math.round(a.y); const nx=cx+DIRS[dir].x, ny=cy+DIRS[dir].y; return tileFree(nx,ny); }
+function setDirIfPossible(a,dir){ if(atCenter(a)&&canTurn(a,dir)) a.dir=dir; }
+
+/* =================== UPDATE LOOP =================== */
+function eatAt(x,y){
+  if(!grid[y]) return;
+  if(grid[y][x]===2){ grid[y][x]=0; score+=10; pellets--; if(audioEnabled && tick%4===0) tone(...SFX.chomp); }
+  else if(grid[y][x]===3){ grid[y][x]=0; score+=50; pellets--; frightenedTimer=600; tone(...SFX.power); }
+}
+
+function step(a){
+  // смена направления только в центре
+  if(atCenter(a) && a.nextDir && canTurn(a,a.nextDir)) a.dir=a.nextDir;
+
+  // если впереди стена — стоим ровно в центре
+  const {tx,ty}=forwardTile(a);
+  if(atCenter(a) && !tileFree(tx,ty)) return;
+
+  // движение
+  a.x += DIRS[a.dir].x * a.speed;
+  a.y += DIRS[a.dir].y * a.speed;
+
+  // завершаем клетку точно центром
+  const cx=Math.round(a.x), cy=Math.round(a.y);
+  if(Math.abs(a.x-cx)<0.12 && Math.abs(a.y-cy)<0.12) { a.x=cx; a.y=cy; }
+  // туннели
+  if(a.x<-0.1) a.x=COLS-1; if(a.x>COLS-0.9) a.x=0;
+  if(a.y<-0.1) a.y=ROWS-1; if(a.y>ROWS-0.9) a.y=0;
+}
+
+function ghostTarget(g){
+  if(frightenedTimer>0) return null; // блуждания
+  if(mode==='scatter') return g.scatter;
+  // разные цели
+  if(g.name==='Blinky') return {x:Math.round(pacman.x),y:Math.round(pacman.y)};
+  if(g.name==='Pinky'){ const d=DIRS[pacman.dir]; return {x:Math.round(pacman.x)+2*d.x, y:Math.round(pacman.y)+2*d.y}; }
+  if(g.name==='Inky'){ const d=DIRS[pacman.dir], ax=Math.round(pacman.x)+2*d.x, ay=Math.round(pacman.y)+2*d.y;
+    const bx=ghosts[0].x, by=ghosts[0].y; return {x:Math.round(ax+(ax-bx)), y:Math.round(ay+(ay-by))}; }
+  // Clyde — иногда уходит в scatter
+  const dist=(g.x-pacman.x)**2+(g.y-pacman.y)**2;
+  return dist<25 ? g.scatter : {x:Math.round(pacman.x),y:Math.round(pacman.y)};
+}
+
+function chooseGhostDir(g){
+  const cx=Math.round(g.x), cy=Math.round(g.y);
+  if(!atCenter(g)) return; // меняем только в центре
+  // варианты, кроме разворота
+  const back={left:'right',right:'left',up:'down',down:'up'}[g.dir];
+  let opts=Object.keys(DIRS).filter(d=>d!==back && tileFree(cx+DIRS[d].x, cy+DIRS[d].y));
+  if(!opts.length) opts=Object.keys(DIRS).filter(d=>tileFree(cx+DIRS[d].x, cy+DIRS[d].y));
+  if(!opts.length) return;
+
+  // испуг — рандом
   if(frightenedTimer>0){
-    if(Math.random()<0.15){
-      const cx=Math.round(g.x), cy=Math.round(g.y);
-      const options=Object.keys(DIRS).filter(d=>canMoveFrom(cx,cy,d));
-      if(options.length) g.dir = options[Math.floor(Math.random()*options.length)];
-    }
+    g.dir = opts[Math.floor(Math.random()*opts.length)];
     return;
   }
 
-  // переключение режимов scatter/chase
-  scatterTimer++;
-  if(!inScatter && scatterTimer>900){ inScatter=true; scatterTimer=0; }
-  else if(inScatter && scatterTimer>360){ inScatter=false; scatterTimer=0; }
+  // цель
+  const tgt=ghostTarget(g);
+  if(!tgt){ g.dir = opts[Math.floor(Math.random()*opts.length)]; return; }
 
-  const cx=Math.round(g.x), cy=Math.round(g.y);
-  const centered=Math.abs(g.x-cx)<0.05 && Math.abs(g.y-cy)<0.05;
-  if(centered){
-    const options=Object.keys(DIRS).filter(d=>canMoveFrom(cx,cy,d));
-    if(options.length){
-      g.dir = chooseDirAtIntersection(g, options);
-    }
+  // лёгкая случайность, чтобы «не стаей»
+  const jitter= (Math.random()<0.15);
+  let best=opts[0], bestDist=1e9;
+  for(const d of opts){
+    const nx=cx+DIRS[d].x, ny=cy+DIRS[d].y;
+    const dx=(nx-tgt.x), dy=(ny-tgt.y);
+    const dist=dx*dx+dy*dy + (jitter ? (Math.random()*2-1)*3 : 0);
+    if(dist<bestDist){ bestDist=dist; best=d; }
   }
-}
-
-/* ================== GAMEPLAY ================== */
-function nextLevel(){
-  levelIndex=(levelIndex+1)%LEVELS.length;
-  lives = 3; // как просил — на новом уровне снова 3 жизни
-  updateHUD();
-  pacman.speed += 0.01;
-  ghosts.forEach((g,i)=>g.speed += 0.012+i*0.001);
-  buildLevel();
+  g.dir=best;
 }
 
 function update(){
   if(paused) return;
-  tick++;
+  tick++; modeTimer++;
+  if(modeTimer>900){ modeTimer=0; mode = (mode==='chase'?'scatter':'chase'); }
 
+  // Пакман
   if(pacman.alive){
-    stepActor(pacman);
+    step(pacman);
     const cx=Math.round(pacman.x), cy=Math.round(pacman.y);
-    if(grid[cy] && (grid[cy][cx]===2 || grid[cy][cx]===3)){
-      score += (grid[cy][cx]===3?50:10); updateHUD();
-      if(grid[cy][cx]===3){ frightenedTimer=600; playTone(SOUND.power,'sawtooth'); }
-      else { if(tick%6===0) playTone(SOUND.chomp,'triangle'); }
-      grid[cy][cx]=0; pellets--; if(pellets<=0) nextLevel();
-    }
+    eatAt(cx,cy);
+    if(pellets<=0) nextLevel();
   }
 
-  ghosts.forEach(g=>{ ghostAI(g); stepActor(g); });
-
+  // Призраки
+  ghosts.forEach(g=>{ chooseGhostDir(g); step(g); });
   if(frightenedTimer>0) frightenedTimer--;
 
-  // столкновения
+  // Столкновения
   for(const g of ghosts){
     const dx=g.x-pacman.x, dy=g.y-pacman.y;
-    if(dx*dx+dy*dy<0.6){
+    if(dx*dx+dy*dy<0.45){
       if(frightenedTimer>0){
-        score+=200; updateHUD(); playTone(SOUND.eatGhost,'square');
+        score+=200; tone(...SFX.eat);
         g.x=13; g.y=14; g.dir='left';
       } else if(pacman.alive){
-        pacman.alive=false; playTone(SOUND.deathA,'square'); setTimeout(()=>playTone(SOUND.deathB,'sine'),160);
+        pacman.alive=false; tone(...SFX.die1); setTimeout(()=>tone(...SFX.die2),160);
         lives=Math.max(0,lives-1); updateHUD();
         if(lives<=0){ paused=true; showBanner('Игра окончена','Нажми «Заново», чтобы сыграть снова.'); }
-        else {
-          Object.assign(pacman,{x:14,y:23,dir:'left',nextDir:'left',alive:true});
-          frightenedTimer=0;
-          [[13,14,'left'],[14,14,'right'],[13,15,'up'],[14,15,'down']].forEach((v,i)=>{ghosts[i].x=v[0];ghosts[i].y=v[1];ghosts[i].dir=v[2];});
-        }
+        else resetActors();
       }
     }
   }
 }
 
-/* ================== RENDER ================== */
-function drawBackdrop(){ ctx.save(); for(let i=0;i<40;i++){ const x=(i*53)%(COLS*TILE), y=((i*97)%(ROWS*TILE)); ctx.fillStyle='rgba(255,255,255,.05)'; ctx.fillRect(x,y,2,2);} ctx.restore(); }
+function nextLevel(){
+  levelIndex++;
+  pacman.speed += 0.01; ghosts.forEach((g,i)=>g.speed += 0.01 + i*0.001);
+  lives=3; // восстановление
+  updateHUD();
+  buildGrid(); resetActors();
+}
+
+/* =================== RENDER =================== */
 function drawMaze(){
-  ctx.clearRect(0,0,canvas.width,canvas.height); drawBackdrop();
+  ctx.clearRect(0,0,canvas.width,canvas.height);
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
     if(grid[r][c]===1){
-      const x=c*TILE,y=r*TILE; const grad=ctx.createLinearGradient(x,y,x,y+TILE);
+      const x=c*TILE,y=r*TILE;
+      const grad=ctx.createLinearGradient(x,y,x,y+TILE);
       grad.addColorStop(0,'rgba(22,42,112,1)'); grad.addColorStop(1,'rgba(8,18,56,1)');
       ctx.fillStyle=grad; ctx.fillRect(x,y,TILE,TILE);
       ctx.strokeStyle='rgba(98,224,255,.65)'; ctx.lineWidth=2; ctx.strokeRect(x+2,y+2,TILE-4,TILE-4);
-      ctx.shadowColor='rgba(74,109,255,.4)'; ctx.shadowBlur=8;
-      ctx.strokeStyle='rgba(74,109,255,.3)'; ctx.strokeRect(x+3,y+3,TILE-6,TILE-6);
-      ctx.shadowBlur=0;
     }
   }
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
     const x=c*TILE+TILE/2, y=r*TILE+TILE/2;
     if(grid[r][c]===2){ ctx.fillStyle='#ffeaae'; ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill(); }
-    else if(grid[r][c]===3){
-      const t=(tick%60)/60, rad=6+Math.sin(t*2*Math.PI)*2;
+    else if(grid[r][c]===3){ const t=(tick%60)/60, rad=6+Math.sin(t*2*Math.PI)*2;
       const glow=ctx.createRadialGradient(x,y,2,x,y,18);
       glow.addColorStop(0,'rgba(255,210,63,.95)'); glow.addColorStop(1,'rgba(255,210,63,.05)');
-      ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(x,y,rad,0,Math.PI*2); ctx.fill();
-    }
+      ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(x,y,rad,0,Math.PI*2); ctx.fill(); }
   }
 }
 function drawActors(){
+  // pacman
   const t=(tick%20)/20, open=0.25+0.15*Math.sin(t*2*Math.PI), angle={left:Math.PI,right:0,up:-Math.PI/2,down:Math.PI/2}[pacman.dir]||0;
   ctx.save(); ctx.translate(pacman.x*TILE+TILE/2,pacman.y*TILE+TILE/2); ctx.rotate(angle);
   const g=ctx.createRadialGradient(0,-4,2,0,0,14); g.addColorStop(0,'#fff4a8'); g.addColorStop(1,'#ffcc00');
-  ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,10,open,Math.PI*2-open); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,10,pacman.alive?open:0,Math.PI*2-(pacman.alive?open:0)); ctx.closePath(); ctx.fill();
   ctx.fillStyle='#071b3a'; ctx.beginPath(); ctx.arc(2,-4,1.6,0,Math.PI*2); ctx.fill(); ctx.restore();
 
+  // ghosts
   ghosts.forEach(gh=>{
     ctx.save(); ctx.translate(gh.x*TILE+TILE/2,gh.y*TILE+TILE/2);
-    const color=frightenedTimer>0?'#4466ff':gh.color;
-    const grd=ctx.createLinearGradient(0,-12,0,12); grd.addColorStop(0,color); grd.addColorStop(1,'#0a1230');
+    const bodyColor = frightenedTimer>0 ? '#4466ff' : gh.color;
+    const grd=ctx.createLinearGradient(0,-12,0,12);
+    grd.addColorStop(0,bodyColor); grd.addColorStop(1,'#0a1230');
     ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(0,-2,10,Math.PI,0,false); ctx.lineTo(10,8);
     for(let i=0;i<4;i++){ ctx.lineTo(6-i*4,12); ctx.lineTo(3-i*4,8); }
     ctx.lineTo(-10,8); ctx.closePath(); ctx.fill();
@@ -355,53 +387,71 @@ function drawActors(){
   });
 }
 function showBanner(title,subtitle){
-  const w=28*24,h=31*24,cx=w/2,cy=h/2;
+  const w=COLS*TILE,h=ROWS*TILE,cx=w/2,cy=h/2;
   ctx.save(); ctx.fillStyle='rgba(0,0,0,.45)'; ctx.fillRect(0,0,w,h); ctx.restore();
   ctx.save(); ctx.fillStyle='rgba(14,26,54,.92)'; ctx.strokeStyle='#3554c6'; ctx.lineWidth=3;
-  ctx.beginPath(); ctx.moveTo(cx-220+16,cy-70); ctx.arcTo(cx+220,cy-70,cx+220,cy+70,16); ctx.arcTo(cx+220,cy+70,cx-220,cy+70,16);
-  ctx.arcTo(cx-220,cy+70,cx-220,cy-70,16); ctx.arcTo(cx-220,cy-70,cx+220,cy-70,16); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.fillStyle='#e6f0ff'; ctx.font='700 24px Inter, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillText(title,cx,cy-16);
-  ctx.font='600 14px Inter, system-ui, sans-serif'; ctx.fillStyle='#a9b9df'; ctx.fillText(subtitle,cx,cy+10); ctx.restore();
+  ctx.beginPath(); const rw=440,rh=150; const r=16;
+  ctx.roundRect(cx-rw/2,cy-rh/2,rw,rh,r);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#e6f0ff'; ctx.textAlign='center';
+  ctx.font='700 24px Inter, system-ui, sans-serif'; ctx.fillText(title,cx,cy-16);
+  ctx.font='600 14px Inter, system-ui, sans-serif'; ctx.fillStyle='#a9b9df'; ctx.fillText(subtitle,cx,cy+10);
+  ctx.restore();
 }
-function render(){ ctx.save(); drawMaze(); drawActors(); if(paused && lives>0) showBanner('Пауза','Пробел или «Продолжить».'); ctx.restore(); }
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){this.moveTo(x+r,y);this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);};
+}
+
+function render(){ drawMaze(); drawActors(); if(paused && lives>0) showBanner('Пауза','Пробел или «Продолжить».'); }
 function loop(){ if(paused){ render(); return; } update(); render(); requestAnimationFrame(loop); }
 
-/* ================== CONTROLS ================== */
+/* =================== UI & INPUT =================== */
 const btnPause=document.getElementById('btnPause');
 const btnRestart=document.getElementById('btnRestart');
 const btnSound=document.getElementById('btnSound');
+const btnMusic=document.getElementById('btnMusic');
 const btnStart=document.getElementById('btnStart');
 const startOverlay=document.getElementById('start');
-const btnMusic=document.getElementById('btnMusic');
 
-btnStart.addEventListener('click', startGame);
+function updateHUD(){
+  scoreEl.textContent=score; livesEl.textContent=Math.max(0,lives); levelEl.textContent=levelIndex+1;
+}
+const scoreEl=document.getElementById('score'), livesEl=document.getElementById('lives'), levelEl=document.getElementById('level');
+
+btnStart.addEventListener('click',startGame);
+startOverlay.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); startGame(); }});
+document.addEventListener('keydown',(e)=>{ if(e.key==='Enter' && startOverlay.style.display!=='none'){ e.preventDefault(); startGame(); }});
+
 function startGame(){
   ensureAudio(); if(audioCtx.state==='suspended') audioCtx.resume();
-  pacman.nextDir=pacman.dir; // сразу поехали
-  musicOn=true; startMusic();
-  btnMusic.textContent='Мелодия ⏹';
-  startOverlay.style.display='none';
-  paused=false; loop();
+  tone(...SFX.start); startOverlay.style.display='none'; canvas.focus(); startMusic();
 }
+
+btnPause.addEventListener('click',()=>{ paused=!paused; btnPause.textContent=paused?'Продолжить ▶':'Пауза ⏸'; if(!paused) loop(); });
+btnRestart.addEventListener('click',()=>{ score=0; lives=3; levelIndex=0; updateHUD(); buildGrid(); resetActors(); paused=false; loop(); });
+btnSound.addEventListener('click',()=>{ audioEnabled=!audioEnabled; btnSound.textContent=audioEnabled?'Звук 🔊':'Звук 🔈'; tone(...SFX.start); });
+btnMusic.addEventListener('click',()=>{ if(!musicOn){ startMusic(); btnMusic.textContent='Мелодия ⏹'; } else { stopMusic(); btnMusic.textContent='Мелодия ♫'; } });
+
 document.addEventListener('keydown',(e)=>{
-  if(e.key==='Enter' && startOverlay.style.display!=='none'){ startGame(); e.preventDefault(); return; }
-  if(DIR_KEYS[e.key]){ pacman.nextDir=DIR_KEYS[e.key]; e.preventDefault(); return; }
+  const k=e.key.toLowerCase();
+  if(DIR_KEYS[k]){ pacman.nextDir=DIR_KEYS[k]; e.preventDefault(); }
   if(e.key===' '){ paused=!paused; btnPause.textContent=paused?'Продолжить ▶':'Пауза ⏸'; if(!paused) loop(); e.preventDefault(); }
 },{passive:false});
 
-btnPause.addEventListener('click',()=>{ paused=!paused; btnPause.textContent=paused?'Продолжить ▶':'Пауза ⏸'; if(!paused) loop(); });
-btnRestart.addEventListener('click',()=>{ score=0; lives=3; levelIndex=0; updateHUD(); buildLevel(); paused=false; loop(); });
-btnSound.addEventListener('click',()=>{ audioEnabled=!audioEnabled; btnSound.textContent=audioEnabled?'Звук 🔊':'Звук 🔈'; playTone(SOUND.start,'triangle'); });
-btnMusic.addEventListener('click',()=>{ ensureAudio(); if(audioCtx.state==='suspended') audioCtx.resume(); musicOn=!musicOn; if(musicOn){ startMusic(); btnMusic.textContent='Мелодия ⏹'; } else { stopMusic(); btnMusic.textContent='Мелодия ♫'; } });
+// свайпы / флики (touch + тачпад быстрым жестом по Pointer Events)
+let pStart=null;
+canvas.addEventListener('pointerdown',(e)=>{ pStart={x:e.clientX,y:e.clientY,t:e.timeStamp}; canvas.setPointerCapture(e.pointerId); },{passive:true});
+canvas.addEventListener('pointerup',(e)=>{
+  if(!pStart) return; const dx=e.clientX-pStart.x, dy=e.clientY-pStart.y, dt=e.timeStamp-pStart.t;
+  const ax=Math.abs(dx), ay=Math.abs(dy);
+  if(Math.max(ax,ay)>15 && dt<400){ // «флик»
+    pacman.nextDir = (ax>ay) ? (dx>0?'right':'left') : (dy>0?'down':'up');
+  }
+  pStart=null;
+},{passive:true});
 
-/* Свайпы — с preventDefault, чтобы не тянуло страницу */
-let touchStart=null;
-const swipeEl = canvas;
-swipeEl.addEventListener('touchstart',(e)=>{ const t=e.changedTouches[0]; touchStart={x:t.clientX,y:t.clientY}; e.preventDefault(); },{passive:false});
-swipeEl.addEventListener('touchend',(e)=>{ if(!touchStart) return; const t=e.changedTouches[0]; const dx=t.clientX-touchStart.x, dy=t.clientY-touchStart.y; if(Math.max(Math.abs(dx),Math.abs(dy))>18){ pacman.nextDir=(Math.abs(dx)>Math.abs(dy))?(dx>0?'right':'left'):(dy>0?'down':'up'); } touchStart=null; e.preventDefault(); },{passive:false});
-
-/* BOOT */
-buildLevel(); updateHUD(); render();
+// построение и запуск
+buildGrid(); resetActors(); updateHUD(); loop();
 </script>
 
 <!-- Telegram Mini App SDK -->
@@ -410,11 +460,12 @@ buildLevel(); updateHUD(); render();
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
+    Telegram.WebApp.BackButton.onClick(() => Telegram.WebApp.close());
+    Telegram.WebApp.BackButton.show();
+    // немного подкрашиваемся под тему
     const tp = Telegram.WebApp.themeParams || {};
     if (tp.secondary_bg_color) document.documentElement.style.setProperty('--panel', tp.secondary_bg_color);
     if (tp.text_color) document.documentElement.style.setProperty('--text', tp.text_color);
-    Telegram.WebApp.BackButton.onClick(() => Telegram.WebApp.close());
-    Telegram.WebApp.BackButton.show();
   }
 </script>
 </body>
