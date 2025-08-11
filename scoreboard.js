@@ -4,7 +4,7 @@
 
   // сначала пытаемся получить данные с сервера (если он настроен)
   try {
-    const resp = await fetch('/api/records');
+    const resp = await fetch('api/records');
     if (resp.ok) {
       records = await resp.json();
     }
