@@ -21,7 +21,8 @@
   records.sort((a,b)=>b.score-a.score);
   records.slice(0,20).forEach((r,i)=>{
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td class="pos">${i+1}</td><td class="name">${r.username}</td><td class="score">${r.score}</td>`;
+    const name = r.username || r.name || r.first_name || r.player || '';
+    tr.innerHTML = `<td class="pos">${i+1}</td><td class="name">${name}</td><td class="score">${r.score}</td>`;
     tbody.appendChild(tr);
   });
 })();
