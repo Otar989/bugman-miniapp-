@@ -8,6 +8,7 @@ let DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 const TILE = 24, COLS = 28, ROWS = 31;
 
 function fitCanvas(){
+  DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
   const w = COLS*TILE, h = ROWS*TILE;
   canvas.width  = Math.round(w * DPR);
   canvas.height = Math.round(h * DPR);
@@ -16,6 +17,7 @@ function fitCanvas(){
 }
 fitCanvas();
 addEventListener('resize', fitCanvas);
+globalThis.Telegram?.WebApp?.onEvent?.('viewportChanged', fitCanvas);
 
 // ===== Audio (минимум, чтобы не падало без жеста)
 let audioCtx, master, sfxGain, musicGain, musicTimer=null, musicOn=false, melodyIndex=0, audioEnabled=true;

@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Bugman — рекорды</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -26,6 +26,18 @@
 </div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+  const tg = window.Telegram?.WebApp;
+  const isTg = tg && (tg.isExpanded || tg.platform === 'ios' || tg.platform === 'android');
+  if (isTg){
+    document.documentElement.classList.add('tg-app');
+    tg.ready();
+    tg.expand();
+    tg.disableVerticalSwipes?.();
+    window.scrollTo(0,0);
+    addEventListener('scroll', () => scrollTo(0,0), { passive:true });
+  }
+</script>
 <script src="scoreboard.js"></script>
 </body>
 </html>

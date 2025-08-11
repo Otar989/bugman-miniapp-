@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Bugman</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -43,15 +43,17 @@
 <!-- Telegram Mini App SDK -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-  // пробуем отключить вертикальные свайпы самого WebView
-  try {
-    Telegram?.WebApp?.ready?.();
-    Telegram?.WebApp?.expand?.();
-    Telegram?.WebApp?.disableVerticalSwipes?.();
-  } catch(_) {}
-  // на всякий случай фиксируем (0,0)
-  window.scrollTo(0,0);
-  addEventListener('scroll', ()=>scrollTo(0,0), {passive:true});
+  const tg = window.Telegram?.WebApp;
+  const isTg = tg && (tg.isExpanded || tg.platform === 'ios' || tg.platform === 'android');
+  if (isTg){
+    document.documentElement.classList.add('tg-app');
+    tg.ready();
+    tg.expand();
+    tg.disableVerticalSwipes?.();
+    // фиксируем позицию страницы
+    window.scrollTo(0,0);
+    addEventListener('scroll', () => scrollTo(0,0), { passive:true });
+  }
 </script>
 
 <!-- Игра -->
