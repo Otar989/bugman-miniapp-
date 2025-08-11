@@ -40,7 +40,7 @@ function tone(freq, dur, type='sine', gainNode=sfxGain){
 }
 function startMusic(){
   ensureAudio();
-  stopMusic(); musicOn = true;
+  stopMusic(true); musicOn = true;
   const THEME = [523, 659, 784, 659, 587, 739, 880, 0, 523, 659, 784, 988]; // простая чиптуна
   let i=0;
   musicTimer = setInterval(()=>{
@@ -50,11 +50,20 @@ function startMusic(){
     i++;
   }, 200);
 }
-function stopMusic(){ musicOn=false; if (musicTimer) clearInterval(musicTimer); }
+function stopMusic(temp=false){
+  if (musicTimer) clearInterval(musicTimer);
+  musicTimer=null;
+  if (!temp) musicOn=false;
+}
 
 // не паузим игру сами по себе, только звук глушим при сворачивании
 document.addEventListener('visibilitychange', ()=>{
-  if (document.hidden) stopMusic();
+  if (document.hidden) {
+    stopMusic(true);
+  } else {
+    if (musicOn) startMusic();
+    btnMusic.textContent = musicOn ? 'Мелодия ⏹' : 'Мелодия ♫';
+  }
 });
 
 // ===== Level
