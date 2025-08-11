@@ -160,6 +160,7 @@ buildLevel();
 
 // ===== HUD
 let levelIndex=0, score=0, lives=3, paused=false, frightened=0, tick=0;
+let rafId;
 function HUD(){ 
   document.getElementById('score').textContent=score;
   document.getElementById('lives').textContent=lives;
@@ -207,7 +208,7 @@ const btnMusic   = document.getElementById('btnMusic');
 const btnStart   = document.getElementById('btnStart');
 const startEl    = document.getElementById('start');
 
-btnPause.onclick = ()=>{ paused=!paused; btnPause.textContent = paused?'Продолжить ▶':'Пауза ⏸'; if (!paused) loop(); };
+btnPause.onclick = ()=>{ paused=!paused; btnPause.textContent = paused?'Продолжить ▶':'Пауза ⏸'; if (!paused){ cancelAnimationFrame(rafId); loop(); } };
 btnRestart.onclick = ()=> restart();
 btnSound.onclick = ()=>{
   audioEnabled=!audioEnabled;
@@ -226,10 +227,13 @@ function startGame(){
   startEl.style.display='none';
   paused=false; btnPause.textContent='Пауза ⏸';
   if (!musicOn) startMusic();
+  cancelAnimationFrame(rafId);
   loop();
 }
 function restart(){
-  score=0; lives=3; levelIndex=0; HUD(); buildLevel(); paused=false; frightened=0; loop();
+  score=0; lives=3; levelIndex=0; HUD(); buildLevel(); paused=false; frightened=0;
+  cancelAnimationFrame(rafId);
+  loop();
 }
 
 // ===== Движок тайлов
@@ -424,7 +428,7 @@ function draw(){
   }
 }
 
-function loop(){ if (paused){ draw(); return; } update(); draw(); requestAnimationFrame(loop); }
+function loop(){ if (paused){ draw(); return; } update(); draw(); rafId = requestAnimationFrame(loop); }
 
 // инициализация HUD
 HUD();
