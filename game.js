@@ -235,9 +235,9 @@ function startHidden(){ return startEl.style.display==='none'; }
 function startGame(){
   ensureAudio(); audioCtx.resume?.();
   startEl.style.display='none';
-  paused=false; btnPause.textContent='Пауза ⏸';
+  btnPause.textContent='Пауза ⏸';
   if (!musicOn) startMusic();
-  loop();
+  restart();
 }
 function restart(){
   score=0; lives=3; levelIndex=0; HUD(); buildLevel(); paused=false; frightened=0; loop();
