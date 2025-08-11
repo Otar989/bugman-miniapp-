@@ -160,6 +160,7 @@ buildLevel();
 
 // ===== HUD
 let levelIndex=0, score=0, lives=3, paused=false, frightened=0, tick=0;
+let loopId = null;
 function HUD(){ 
   document.getElementById('score').textContent=score;
   document.getElementById('lives').textContent=lives;
@@ -226,10 +227,15 @@ function startGame(){
   startEl.style.display='none';
   paused=false; btnPause.textContent='Пауза ⏸';
   if (!musicOn) startMusic();
+  if (loopId !== null) cancelAnimationFrame(loopId);
+  loopId = null;
   loop();
 }
 function restart(){
-  score=0; lives=3; levelIndex=0; HUD(); buildLevel(); paused=false; frightened=0; loop();
+  score=0; lives=3; levelIndex=0; HUD(); buildLevel(); paused=false; frightened=0; tick=0;
+  if (loopId !== null) cancelAnimationFrame(loopId);
+  loopId = null;
+  loop();
 }
 
 // ===== Движок тайлов
@@ -424,7 +430,12 @@ function draw(){
   }
 }
 
-function loop(){ if (paused){ draw(); return; } update(); draw(); requestAnimationFrame(loop); }
+function loop(){
+  if (paused){ draw(); return; }
+  update();
+  draw();
+  loopId = requestAnimationFrame(loop);
+}
 
 // инициализация HUD
 HUD();
