@@ -119,6 +119,17 @@ const pacman = { x:spawn.x, y:spawn.y, dir:spawn.dir, nextDir:spawn.dir, speed:0
 function inBounds(c,r){ return c>=0&&c<COLS&&r>=0&&r<ROWS; }
 
 function buildLevel(){
+  // найти точку появления на карте (символ 'P'), если есть
+  for (let r=0;r<ROWS;r++){
+    const line = RAW[r] || "";
+    const c = line.indexOf('P');
+    if (c !== -1){
+      spawn.x = c + 0.5;
+      spawn.y = r + 0.5;
+      break;
+    }
+  }
+
   pellets=0;
   // первичный разбор: стены / «дверь» -- считаем стеной
   grid = Array.from({length:ROWS}, (_,r)=> Array.from({length:COLS}, (_,c)=>{
