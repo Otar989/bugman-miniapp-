@@ -474,6 +474,9 @@ function update(){
         lives=Math.max(0,lives-1); HUD();
         if (lives<=0 && !gameOver){
           paused=true; gameOver=true; saveRecord(score);
+          setTimeout(()=>{
+            if (confirm('Жизни закончились. Начать заново?')) restart();
+          }, 0);
         }
         else {
           // респавн в центр (не в стену)
