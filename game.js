@@ -220,17 +220,27 @@ function HUD(){
   document.getElementById('level').textContent=levelIndex+1;
 }
 
-function saveRecord(finalScore){
+async function saveRecord(finalScore){
   try {
     const user = Telegram?.WebApp?.initDataUnsafe?.user;
     const name = user?.username || user?.first_name || 'Безымянный';
-    if (typeof localStorage === 'undefined') return;
-    const records = JSON.parse(localStorage.getItem('records') || '[]');
-    const ex = records.find(r=>r.username===name);
-    if (!ex || finalScore>ex.score){
-      if (ex) ex.score = finalScore; else records.push({username:name, score:finalScore});
-      localStorage.setItem('records', JSON.stringify(records));
+
+    // локальное хранилище — fallback, чтобы рекорд сохранялся даже без сервера
+    if (typeof localStorage !== 'undefined'){
+      const records = JSON.parse(localStorage.getItem('records') || '[]');
+      const ex = records.find(r=>r.username===name);
+      if (!ex || finalScore>ex.score){
+        if (ex) ex.score = finalScore; else records.push({username:name, score:finalScore});
+        localStorage.setItem('records', JSON.stringify(records));
+      }
     }
+
+    // попытка отправить рекорд на бэкенд (если он настроен)
+    await fetch('/api/records', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ username:name, score:finalScore })
+    }).catch(()=>{}); // тихо игнорируем ошибки сети
   } catch(_){ }
 }
 
