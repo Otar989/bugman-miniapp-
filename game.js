@@ -93,7 +93,7 @@ const RAW = [
 "1  111111 11 11 11 111111  1",
 "1   22                22   1",
 "1 111111111111111111111111 1",
-"1                          1",
+"1            p             1",
 "1 1111111111 11 1111111111 1",
 "1                          1",
 "1 1111111111 11 1111111111 1",
@@ -106,7 +106,7 @@ const WALL=1, EMPTY=0, DOT=2, POWER=3;
 let grid=[], pellets=0;
 
 // стартовые координаты (строго центр клетки)
-const spawn = { x:13.5, y:23.5, dir:'left' };
+let spawn = { x:13.5, y:23.5, dir:'left' };
 const ghosts = [
   {name:'Blinky', color:'#ff4b5c', x:13.5, y:14.5, dir:'left',  speed:0.095, mode:'chase'},
   {name:'Pinky',  color:'#ff7ad9', x:14.5, y:14.5, dir:'right', speed:0.090, mode:'chase'},
@@ -117,6 +117,45 @@ const pacman = { x:spawn.x, y:spawn.y, dir:spawn.dir, nextDir:spawn.dir, speed:0
 
 function inBounds(c,r){ return c>=0&&c<COLS&&r>=0&&r<ROWS; }
 
+function findNearestPassable(tx,ty){
+  const seen = Array.from({length:ROWS},()=>Array(COLS).fill(false));
+  const q=[[tx,ty]]; seen[ty][tx]=true;
+  while(q.length){
+    const [cx,cy]=q.shift();
+    if (grid[cy] && grid[cy][cx]!==WALL) return {x:cx+0.5,y:cy+0.5};
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+      const nx=cx+dx, ny=cy+dy;
+      if(!inBounds(nx,ny) || seen[ny][nx]) continue;
+      seen[ny][nx]=true; q.push([nx,ny]);
+    }
+  }
+  return {x:tx+0.5,y:ty+0.5};
+}
+
+function getValidSpawn(){
+  let sx=Math.floor(spawn.x), sy=Math.floor(spawn.y);
+  for(let r=0;r<ROWS;r++){
+    const c=(RAW[r]||'').indexOf('p');
+    if(c>=0){ sx=c; sy=r; break; }
+  }
+  return findNearestPassable(sx,sy);
+}
+
+function spawnPlayer(){
+  const s=getValidSpawn();
+  pacman.x=Math.floor(s.x)+0.5;
+  pacman.y=Math.floor(s.y)+0.5;
+  pacman.dir=spawn.dir;
+  pacman.nextDir=spawn.dir;
+  pacman.speed=0.11;
+  pacman.alive=true;
+  const tile=grid[Math.floor(pacman.y)]?.[Math.floor(pacman.x)];
+  if(tile===WALL){
+    const safe=findNearestPassable(Math.floor(pacman.x),Math.floor(pacman.y));
+    pacman.x=safe.x; pacman.y=safe.y;
+  }
+}
+
 function buildLevel(){
   pellets=0;
   // первичный разбор: стены / «дверь» -- считаем стеной
@@ -125,6 +164,9 @@ function buildLevel(){
     if (ch==='1' || ch==='-') return WALL;
     return EMPTY; // всё остальное пока пусто
   }));
+
+  const valid = getValidSpawn();
+  spawn.x = valid.x; spawn.y = valid.y;
 
   // заполняем съедобное везде, где не стены и не «дом призраков»
   for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){
@@ -158,7 +200,7 @@ function buildLevel(){
   }
 
   // сброс позиций
-  Object.assign(pacman, { x:spawn.x, y:spawn.y, dir:spawn.dir, nextDir:spawn.dir, speed:0.11, alive:true });
+  spawnPlayer();
   ghosts[0].x=13.5; ghosts[0].y=14.5; ghosts[0].dir='left';
   ghosts[1].x=14.5; ghosts[1].y=14.5; ghosts[1].dir='right';
   ghosts[2].x=13.5; ghosts[2].y=15.5; ghosts[2].dir='up';
@@ -398,7 +440,7 @@ function update(){
         if (lives<=0){ paused=true; }
         else {
           // респавн в центр (не в стену)
-          Object.assign(pacman, { x:spawn.x, y:spawn.y, dir:'left', nextDir:'left', alive:true });
+          spawnPlayer();
           frightened=0;
           ghosts[0].x=13.5; ghosts[0].y=14.5; ghosts[0].dir='left';
           ghosts[1].x=14.5; ghosts[1].y=14.5; ghosts[1].dir='right';
@@ -473,3 +515,7 @@ function loop(){ if (paused){ draw(); return; } update(); draw(); requestAnimati
 
 // инициализация HUD
 HUD();
+
+if (typeof module !== 'undefined') {
+  module.exports = { buildLevel, spawnPlayer, getValidSpawn, grid, WALL, pacman, spawn, RAW };
+}
