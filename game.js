@@ -41,8 +41,13 @@ function tone(freq, dur, type='sine', gainNode=sfxGain){
 function startMusic(){
   ensureAudio();
   stopMusic(); musicOn = true;
-  // более «залипательная» мелодия с басом и повторяющимся мотивом
-  const THEME = [523,659,784,659,880,988,880,784, 659,587,659,523,392,440,523,0];
+  // более заметная цикличная мелодия с паузами и простым басом
+  const THEME = [
+    523,0, 523,0, 659,0, 784,0,
+    659,0, 880,0, 988,0, 880,0,
+    784,0, 659,0, 587,0, 659,0,
+    523,0, 392,0, 440,0, 523,0
+  ];
   let i=0;
   musicTimer = setInterval(()=>{
     if (!musicOn) return;
@@ -75,13 +80,13 @@ const RAW = [
 "1 1111 11 11111111 11 1111 1",
 "1      11    11    11      1",
 "11111  11111 11 11111  11111",
-"00001  11111 11 11111  10000",
-"00001  11          11  10000",
+"11111  11111 11 11111  11111",
+"11111  11          11  11111",
 "11111  11 111--111 11  11111",
 "     .    1G B P1    .      ",
 "11111  11 11111111 11  11111",
-"00001  11    22    11  10000",
-"00001  11 11111111 11  10000",
+"11111  11    22    11  11111",
+"11111  11 11111111 11  11111",
 "11111  11 11    11 11  11111",
 "1            11            1",
 "1 1111 11111 11 11111 1111 1",
@@ -102,7 +107,7 @@ const WALL=1, EMPTY=0, DOT=2, POWER=3;
 let grid=[], pellets=0;
 
 // стартовые координаты (строго центр клетки)
-const spawn = { x:13.5, y:23.5, dir:'left' };
+const spawn = { x:13.5, y:24.5, dir:'left' };
 const ghosts = [
   {name:'Blinky', color:'#ff4b5c', x:13.5, y:14.5, dir:'left',  speed:0.095, mode:'chase'},
   {name:'Pinky',  color:'#ff7ad9', x:14.5, y:14.5, dir:'right', speed:0.090, mode:'chase'},
@@ -159,16 +164,18 @@ function buildLevel(){
   ghosts[1].x=14.5; ghosts[1].y=14.5; ghosts[1].dir='right';
   ghosts[2].x=13.5; ghosts[2].y=15.5; ghosts[2].dir='up';
   ghosts[3].x=14.5; ghosts[3].y=15.5; ghosts[3].dir='down';
+  // точка под пакманом съедается сразу, чтобы он начинал с поедания
+  eatAt(pacman.x, pacman.y);
 }
-buildLevel();
-
 // ===== HUD
 let levelIndex=0, score=0, lives=3, paused=false, frightened=0, tick=0;
-function HUD(){ 
+function HUD(){
   document.getElementById('score').textContent=score;
   document.getElementById('lives').textContent=lives;
   document.getElementById('level').textContent=levelIndex+1;
 }
+
+buildLevel();
 
 // ===== Управление
 const DIRS = {left:{x:-1,y:0}, right:{x:1,y:0}, up:{x:0,y:-1}, down:{x:0,y:1}};
