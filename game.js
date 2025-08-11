@@ -18,7 +18,7 @@ fitCanvas();
 addEventListener('resize', fitCanvas);
 
 // ===== Audio (минимум, чтобы не падало без жеста)
-let audioCtx, master, sfxGain, musicGain, musicTimer=null, musicOn=false, audioEnabled=true;
+let audioCtx, master, sfxGain, musicGain, musicTimer=null, musicOn=false, melodyIndex=0, audioEnabled=true;
 function ensureAudio(){
   if (!audioCtx) {
     audioCtx = new (window.AudioContext||window.webkitAudioContext)();
@@ -38,12 +38,18 @@ function tone(freq, dur, type='sine', gainNode=sfxGain){
   g.gain.exponentialRampToValueAtTime(0.001, now+dur);
   o.connect(g).connect(gainNode); o.start(now); o.stop(now+dur+0.02);
 }
+const THEMES = [
+  [523, 659, 784, 659, 587, 739, 880, 0, 523, 659, 784, 988],
+  [659, 523, 587, 523, 494, 587, 659, 0, 659, 587, 523, 587],
+  [440, 554, 659, 554, 440, 554, 659, 0, 659, 554, 440, 554]
+];
+
 function startMusic(){
   ensureAudio();
   stopMusic();
   if (musicTimer !== null){ clearInterval(musicTimer); musicTimer=null; }
   musicOn = true;
-  const THEME = [523, 659, 784, 659, 587, 739, 880, 0, 523, 659, 784, 988]; // простая чиптуна
+  const THEME = THEMES[melodyIndex];
   let i=0;
   musicTimer = setInterval(()=>{
     if (!musicOn) return;
@@ -224,7 +230,7 @@ btnPause.onclick = ()=>{
   } else {
     if (resumeMusic){
       startMusic();
-      btnMusic.textContent = 'Мелодия ⏹';
+      btnMusic.textContent = `Мелодия ${melodyIndex+1} ⏹`;
     } else {
       btnMusic.textContent = 'Мелодия ♫';
     }
@@ -238,8 +244,20 @@ btnSound.onclick = ()=>{
   if (audioEnabled) tone(800,0.12,'triangle');
 };
 btnMusic.onclick = ()=>{
-  if (!musicOn){ startMusic(); btnMusic.textContent='Мелодия ⏹'; }
-  else { stopMusic(); btnMusic.textContent='Мелодия ♫'; }
+  if (!musicOn){
+    startMusic();
+    btnMusic.textContent = `Мелодия ${melodyIndex+1} ⏹`;
+  } else {
+    melodyIndex++;
+    if (melodyIndex<3){
+      startMusic();
+      btnMusic.textContent = `Мелодия ${melodyIndex+1} ⏹`;
+    } else {
+      stopMusic();
+      melodyIndex=0;
+      btnMusic.textContent='Мелодия ♫';
+    }
+  }
 };
 btnStart.onclick = () => startGame();
 
@@ -248,7 +266,10 @@ function startGame(){
   ensureAudio(); audioCtx.resume?.();
   startEl.style.display='none';
   paused=false; btnPause.textContent='Пауза ⏸';
-  if (!musicOn) startMusic();
+  if (!musicOn){
+    startMusic();
+    btnMusic.textContent = `Мелодия ${melodyIndex+1} ⏹`;
+  }
   loop();
 }
 function restart(){
