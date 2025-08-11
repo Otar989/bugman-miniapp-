@@ -6,7 +6,7 @@
 
 /* телега-мобайл: прибиваем скролл вообще */
 html,body{
-  margin:0; height:100%;
+  margin:0; height:100dvh;
   background:radial-gradient(1200px 500px at 70% -10%, #14264d 0%, #0a1124 55%, #070b16 100%);
   color:var(--text);
   font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
@@ -15,7 +15,7 @@ html,body{
   position:fixed; inset:0;        /* iOS: нет «протягивания» */
 }
 
-.wrap{display:grid;grid-template-rows:auto 1fr auto;min-height:100%}
+.wrap{display:grid;grid-template-rows:auto 1fr auto auto;height:100dvh}
 header{
   display:flex;gap:14px;align-items:center;justify-content:space-between;
   padding:10px 14px;background:linear-gradient(180deg,var(--panel),#0c1324);
@@ -36,7 +36,7 @@ canvas{
   width:min(96vw, 920px);
   height:auto;
   aspect-ratio: 28 / 31; /* ровно как сетка */
-  max-height:78vh;
+  max-height:min(78vh, calc(100dvh - 170px));
   background:#020817;border-radius:18px;
   box-shadow:0 12px 40px rgba(0,0,0,.45), inset 0 0 0 3px #0e1a36;
   outline:none;
