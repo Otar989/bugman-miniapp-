@@ -160,6 +160,7 @@ buildLevel();
 
 // ===== HUD
 let levelIndex=0, score=0, lives=3, paused=false, frightened=0, tick=0;
+let resumeMusic=false; // помнить состояние мелодии во время паузы
 function HUD(){ 
   document.getElementById('score').textContent=score;
   document.getElementById('lives').textContent=lives;
@@ -207,7 +208,23 @@ const btnMusic   = document.getElementById('btnMusic');
 const btnStart   = document.getElementById('btnStart');
 const startEl    = document.getElementById('start');
 
-btnPause.onclick = ()=>{ paused=!paused; btnPause.textContent = paused?'Продолжить ▶':'Пауза ⏸'; if (!paused) loop(); };
+btnPause.onclick = ()=>{
+  const wasMusicOn = musicOn; // запоминаем текущую мелодию
+  paused = !paused;
+  btnPause.textContent = paused ? 'Продолжить ▶' : 'Пауза ⏸';
+  if (paused){
+    resumeMusic = wasMusicOn;
+    stopMusic();
+  } else {
+    if (resumeMusic){
+      startMusic();
+      btnMusic.textContent = 'Мелодия ⏹';
+    } else {
+      btnMusic.textContent = 'Мелодия ♫';
+    }
+    loop();
+  }
+};
 btnRestart.onclick = ()=> restart();
 btnSound.onclick = ()=>{
   audioEnabled=!audioEnabled;
