@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="wrap">
+<div class="app">
   <header>
     <div class="brand"><div class="dot"></div><h1>Bugman</h1></div>
     <div class="hud">
@@ -26,18 +26,7 @@
 </div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script>
-  const tg = window.Telegram?.WebApp;
-  const isTg = tg && (tg.isExpanded || tg.platform === 'ios' || tg.platform === 'android');
-  if (isTg){
-    document.documentElement.classList.add('tg-app');
-    tg.ready();
-    tg.expand();
-    tg.disableVerticalSwipes?.();
-    window.scrollTo(0,0);
-    addEventListener('scroll', () => scrollTo(0,0), { passive:true });
-  }
-</script>
+<script src="init.js"></script>
 <script src="scoreboard.js"></script>
 </body>
 </html>
