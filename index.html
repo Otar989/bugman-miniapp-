@@ -125,7 +125,7 @@
   const canvas = document.getElementById('canvas');
   const stopIfCanvas = (e)=>{
     if (e.target === canvas || canvas.contains(e.target)) {
-      e.preventDefault(); e.stopPropagation();
+      e.preventDefault();
     }
   };
   ['touchstart','touchmove','touchend','gesturestart','gesturechange','gestureend']
