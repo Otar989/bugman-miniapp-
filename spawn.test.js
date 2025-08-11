@@ -5,15 +5,16 @@ function stubCtx(){
 }
 function stubEl(){
   return {
-    getContext: ()=>stubCtx(),
-    style:{},
-    addEventListener: ()=>{},
-    removeEventListener: ()=>{},
-    click: ()=>{},
-    textContent:'',
-    classList:{add:()=>{},remove:()=>{}}
-  };
-}
+      getContext: ()=>stubCtx(),
+      style:{},
+      addEventListener: ()=>{},
+      removeEventListener: ()=>{},
+      click: ()=>{},
+      textContent:'',
+      classList:{add:()=>{},remove:()=>{}},
+      querySelector: ()=>({textContent:''})
+    };
+  }
 
 global.window = { devicePixelRatio:1, addEventListener:()=>{} };
 global.document = {
