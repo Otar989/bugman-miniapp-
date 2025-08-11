@@ -98,17 +98,19 @@ const WALL=1, EMPTY=0, DOT=2, POWER=3;
 
 class Grid {
   constructor(raw){
-    this.cols=COLS; this.rows=ROWS;
-    this.cells=Array.from({length:ROWS}, (_,r)=>
-      Array.from({length:COLS}, (_,c)=>{
+    this.cols = COLS; this.rows = ROWS;
+    this.data = new Uint8Array(this.cols*this.rows);
+    for(let r=0;r<this.rows;r++){
+      for(let c=0;c<this.cols;c++){
         const ch=(raw[r]||'')[c]||' ';
-        return (ch==='1'||ch==='-')?WALL:EMPTY;
-      })
-    );
+        this.data[r*this.cols+c] = (ch==='1'||ch==='-')?WALL:EMPTY;
+      }
+    }
   }
   inBounds(c,r){ return c>=0&&c<this.cols&&r>=0&&r<this.rows; }
-  get(c,r){ return this.cells[r][c]; }
-  set(c,r,v){ this.cells[r][c]=v; }
+  idx(c,r){ return r*this.cols + c; }
+  get(c,r){ return this.data[this.idx(c,r)]; }
+  set(c,r,v){ this.data[this.idx(c,r)] = v; }
 }
 
 let grid=null, pellets=0;
