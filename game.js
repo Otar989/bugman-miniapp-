@@ -276,10 +276,10 @@ function stepActor(a){
   a.y += DIRS[a.dir].y * a.speed;
 
   // тоннели
-  if (a.x< -0.5) a.x = COLS-0.5;
-  if (a.x> COLS-0.5) a.x = -0.5;
-  if (a.y< -0.5) a.y = ROWS-0.5;
-  if (a.y> ROWS-0.5) a.y = -0.5;
+  if (a.x < 0) a.x += COLS;
+  else if (a.x >= COLS) a.x -= COLS;
+  if (a.y < 0) a.y += ROWS;
+  else if (a.y >= ROWS) a.y -= ROWS;
 }
 
 function ghostAI(g){
