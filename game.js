@@ -220,8 +220,13 @@ function HUD(){
 
 // ===== Управление
 const DIRS = {left:{x:-1,y:0}, right:{x:1,y:0}, up:{x:0,y:-1}, down:{x:0,y:1}};
-const KEYS = {ArrowLeft:'left', ArrowRight:'right', ArrowUp:'up', ArrowDown:'down',
-              a:'left', d:'right', w:'up', s:'down', A:'left', D:'right', W:'up', S:'down'};
+const KEYS = {
+  ArrowLeft:'left', ArrowRight:'right', ArrowUp:'up', ArrowDown:'down',
+  a:'left', A:'left', ф:'left', Ф:'left',
+  d:'right', D:'right', в:'right', В:'right',
+  w:'up', W:'up', ц:'up', Ц:'up',
+  s:'down', S:'down', ы:'down', Ы:'down'
+};
 
 addEventListener('keydown', (e)=>{
   if (KEYS[e.key]){ pacman.nextDir = KEYS[e.key]; e.preventDefault(); }
