@@ -1,43 +1,35 @@
 :root{
   --bg:#070b16; --panel:#0f1629; --accent:#ffd23f;
   --text:#e6f0ff; --muted:#8aa0c6;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --vh: 100dvh; /* будет заменено скриптом в Telegram */
 }
 *{box-sizing:border-box}
 
 /* базовая разметка */
 html,body{
+  height:100%;
   margin:0;
   background:radial-gradient(1200px 500px at 70% -10%, #14264d 0%, #0a1124 55%, #070b16 100%);
   color:var(--text);
   font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
 }
 
-/* Telegram Mini App: полноэкранный режим без прокрутки */
-html.tg-app, html.tg-app body{
-  height:100dvh;
-  overflow:hidden;              /* нет прокрутки */
-  overscroll-behavior:none;     /* нет резинки */
-  position:fixed; inset:0;      /* iOS: нет «протягивания» */
-  touch-action:none;            /* запрет системных жестов */
-}
-
-.wrap{
+.app{
   display:grid;
   grid-template-rows:auto 1fr auto auto;
-  min-height:100vh;
+  min-height:var(--vh);
+  padding-top:calc(var(--safe-top) + 12px);         /* отступ под вырез/хедер */
+  padding-right:calc(var(--safe-right) + 8px);      /* чтобы не пряталось под … */
+  padding-bottom:calc(var(--safe-bottom) + 8px);
+  overscroll-behavior:none;
 }
 
-html.tg-app .wrap{
-  height:100dvh;
-  padding-left:env(safe-area-inset-left);  /* отступы под вырезы */
-  padding-right:env(safe-area-inset-right);
-}
 header{
   display:flex;gap:14px;align-items:center;justify-content:space-between;
-  padding-top:calc(10px + env(safe-area-inset-top));
-  padding-bottom:10px;
-  padding-left:calc(14px + env(safe-area-inset-left));
-  padding-right:calc(14px + env(safe-area-inset-right));
+  padding:10px 14px;
   background:linear-gradient(180deg,var(--panel),#0c1324);
   border-bottom:1px solid #172344;position:sticky;top:0;z-index:5
 }
@@ -47,6 +39,11 @@ header{
 h1{margin:0;font-size:16px;font-weight:800;letter-spacing:.6px}
 
 .hud{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.top-bar, .hud {
+  margin-top: 0;
+  inset-inline-end: 0;
+  translate: 0 0;
+}
 .chip{background:#0b1430;border:1px solid #1b2c56;border-radius:999px;
   padding:6px 10px;display:flex;align-items:center;gap:8px;font-weight:700}
 .chip .dot{width:8px;height:8px;border-radius:50%;background:#2b3f72}
@@ -56,7 +53,7 @@ canvas{
   width:min(96vw, 920px);
   height:auto;
   aspect-ratio: 28 / 31; /* ровно как сетка */
-  max-height:min(78vh, calc(100dvh - 170px));
+  max-height:min(78vh, calc(var(--vh) - 170px));
   background:#020817;border-radius:18px;
   box-shadow:0 12px 40px rgba(0,0,0,.45), inset 0 0 0 3px #0e1a36;
   outline:none;
@@ -67,12 +64,17 @@ canvas{
 
 .legend{padding:0 14px 14px;color:var(--muted);text-align:center;font-size:12px}
 footer{
-  padding-top:10px;
-  padding-bottom:calc(10px + env(safe-area-inset-bottom));
-  padding-left:calc(14px + env(safe-area-inset-left));
-  padding-right:calc(14px + env(safe-area-inset-right));
+  padding:10px 14px;
   color:#8aa0c6;text-align:center;font-size:12px
 }
+
+.dropdown, .modal {
+  top: calc(var(--safe-top) + 8px) !important;
+  max-height: calc(var(--vh) - var(--safe-top) - var(--safe-bottom) - 16px);
+  overflow:auto;
+}
+
+.align-left { right:auto; left:8px; }
 
 /* стартовая плашка */
 .start{position:fixed;inset:0;display:grid;place-items:center;
