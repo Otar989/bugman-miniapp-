@@ -236,7 +236,7 @@ async function saveRecord(finalScore){
     }
 
     // попытка отправить рекорд на бэкенд (если он настроен)
-    await fetch('/api/records', {
+    await fetch('api/records', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ username:name, score:finalScore })
