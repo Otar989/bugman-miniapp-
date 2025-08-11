@@ -411,10 +411,13 @@ document.addEventListener('keydown', (e)=>{
 function beginFromOverlay(){
   startOverlay.style.display = 'none';
   ensureAudio();
-  if (audioCtx.state==='suspended') audioCtx.resume();
-  playTone(880,0.14,'triangle');
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  playTone(880, 0.14, 'triangle');
   if (musicOn) startMusic();
   canvas.focus();
+
+  // ВАЖНО: запускаем игру и цикл
+  startNewGame();
 }
 
 /* клавиатура */
