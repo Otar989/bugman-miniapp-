@@ -11,16 +11,22 @@
       --text:#e6f0ff; --muted:#8aa0c6; --neon:#4a6dff;
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;color:var(--text);
+    /* Полное отсутствие прокрутки страницы/вебвью */
+    html,body{
+      height:100%; margin:0; color:var(--text);
       font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
       background:radial-gradient(1200px 500px at 70% -10%, #14264d 0%, #0a1124 55%, #070b16 100%);
-      overflow:hidden;                 /* гасим прокрутку всей страницы */
-      overscroll-behavior:none;        /* гасим pull-to-refresh/свайпы контейнера */
+      overflow:hidden;                 /* не даём скроллить страницу */
+      overscroll-behavior:none;        /* глушим резиновый скролл */
+      position:fixed; inset:0;         /* iOS: убираем “протягивание” */
     }
+
     .wrap{display:grid;grid-template-rows:auto 1fr auto;min-height:100%}
-    header{display:flex;gap:16px;align-items:center;justify-content:space-between;
+    header{
+      display:flex;gap:16px;align-items:center;justify-content:space-between;
       padding:10px 14px;background:linear-gradient(180deg,var(--panel),#0c1324);
-      border-bottom:1px solid #172344;position:sticky;top:0;z-index:5}
+      border-bottom:1px solid #172344;position:sticky;top:0;z-index:5
+    }
     .brand{display:flex;gap:10px;align-items:center}
     .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);
       box-shadow:0 0 18px 6px rgba(255,210,63,.6)}
@@ -30,17 +36,21 @@
       padding:6px 10px;display:flex;align-items:center;gap:8px;font-weight:700}
     .chip .dot{width:8px;height:8px;border-radius:50%;background:#2b3f72;
       box-shadow:0 0 10px rgba(43,63,114,.6) inset}
+
     #game{display:grid;place-items:center;padding:8px}
     canvas{
       width:min(94vw,960px);
-      /* на телефоне крупнее */
       height:auto; aspect-ratio: 28 / 31;
       max-height:78vh;
       background:#020817;border-radius:18px;
       box-shadow:0 12px 40px rgba(0,0,0,.45), inset 0 0 0 3px #0e1a36;
       outline:none;
-      touch-action:none;              /* жесты идут в игру, а не в скролл */
+
+      /* ключевое — все жесты только внутрь игры */
+      touch-action:none;               /* запрещаем браузерные жесты */
+      overscroll-behavior:none;        /* и инерционный скролл контейнера */
     }
+
     .legend{padding:0 14px 14px;color:var(--muted);text-align:center;font-size:12px}
     footer{padding:10px 14px;color:#8aa0c6;text-align:center;font-size:12px}
 
@@ -97,20 +107,43 @@
 <!-- Telegram Mini App SDK -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
-    const tp = Telegram.WebApp.themeParams || {};
-    if (tp.secondary_bg_color) document.documentElement.style.setProperty('--panel', tp.secondary_bg_color);
-    if (tp.text_color) document.documentElement.style.setProperty('--text', tp.text_color);
-    // Если доступно — гасим вертикальные свайпы самого webview
-    if (Telegram.WebApp.disableVerticalSwipes) {
+  // Пытаемся выключить вертикальные свайпы самого Telegram WebView
+  try{
+    Telegram?.WebApp?.ready?.();
+    Telegram?.WebApp?.expand?.();
+    if (Telegram?.WebApp?.disableVerticalSwipes) {
       Telegram.WebApp.disableVerticalSwipes();
     }
-  }
+  }catch(_){}
 </script>
 
-<!-- Вся логика игры -->
+<!-- Игра -->
 <script src="./game.js"></script>
+
+<!-- Агрессивная блокировка прокрутки/свайпов в области игры -->
+<script>
+(function(){
+  const canvas = document.getElementById('canvas');
+
+  // Фиксируем страницу в (0,0) на всякий случай
+  window.scrollTo(0,0);
+  window.addEventListener('scroll', ()=> window.scrollTo(0,0), {passive:true});
+
+  // Любой touch внутри canvas — только для игры
+  const stopIfCanvas = (e)=>{
+    if (e.target === canvas || canvas.contains(e.target)) {
+      e.preventDefault(); e.stopPropagation();
+    }
+  };
+  ['touchstart','touchmove','touchend','gesturestart','gesturechange','gestureend']
+    .forEach(ev => document.addEventListener(ev, stopIfCanvas, {passive:false, capture:true}));
+
+  // На некоторых устройствах ещё помогает отмена wheel в canvas
+  canvas.addEventListener('wheel', (e)=>{ e.preventDefault(); e.stopPropagation(); }, {passive:false});
+
+  // Если Телега не поддерживает disableVerticalSwipes, то этим мы блокируем
+  // «легкий» пан‑свайп своего контейнера.
+})();
+</script>
 </body>
 </html>
