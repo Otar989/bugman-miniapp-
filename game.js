@@ -176,7 +176,11 @@ const KEYS = {ArrowLeft:'left', ArrowRight:'right', ArrowUp:'up', ArrowDown:'dow
 
 addEventListener('keydown', (e)=>{
   if (KEYS[e.key]){ pacman.nextDir = KEYS[e.key]; e.preventDefault(); }
-  else if (e.key===' '){ paused=!paused; document.getElementById('btnPause').textContent = paused?'Продолжить ▶':'Пауза ⏸'; e.preventDefault(); }
+  else if (e.key===' '){
+    // пробрасываем на кнопку паузы, чтобы логика совпадала
+    document.getElementById('btnPause').click();
+    e.preventDefault();
+  }
   else if (e.key==='Enter'){
     // если оверлей ещё открыт — начинаем; иначе — рестарт
     if (!startHidden()){ startGame(); } else restart();
