@@ -40,7 +40,9 @@ function tone(freq, dur, type='sine', gainNode=sfxGain){
 }
 function startMusic(){
   ensureAudio();
-  stopMusic(); musicOn = true;
+  stopMusic();
+  if (musicTimer !== null){ clearInterval(musicTimer); musicTimer=null; }
+  musicOn = true;
   const THEME = [523, 659, 784, 659, 587, 739, 880, 0, 523, 659, 784, 988]; // простая чиптуна
   let i=0;
   musicTimer = setInterval(()=>{
@@ -50,7 +52,7 @@ function startMusic(){
     i++;
   }, 200);
 }
-function stopMusic(){ musicOn=false; if (musicTimer) clearInterval(musicTimer); }
+function stopMusic(){ musicOn=false; if (musicTimer){ clearInterval(musicTimer); musicTimer=null; } }
 
 // не паузим игру сами по себе, только звук глушим при сворачивании
 document.addEventListener('visibilitychange', ()=>{
@@ -229,7 +231,7 @@ function startGame(){
   loop();
 }
 function restart(){
-  score=0; lives=3; levelIndex=0; HUD(); buildLevel(); paused=false; frightened=0; loop();
+  score=0; lives=3; levelIndex=0; HUD(); buildLevel(); if (musicOn) startMusic(); paused=false; frightened=0; loop();
 }
 
 // ===== Движок тайлов
@@ -326,6 +328,7 @@ function nextLevel(){
   // жизни снова 3 по твоему запросу
   lives = 3; HUD();
   buildLevel();
+  if (musicOn) startMusic();
 }
 
 function update(){
