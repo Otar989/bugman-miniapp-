@@ -262,8 +262,14 @@ addEventListener('keydown', (e)=>{
     e.preventDefault();
   }
   else if (e.key==='Enter'){
-    // если оверлей ещё открыт — начинаем; иначе — рестарт
-    if (!startHidden()){ startGame(); } else restart();
+    if (!startHidden()){
+      if (gameOver){
+        hideStartOverlay();
+        restart();
+      } else {
+        startGame();
+      }
+    } else restart();
     e.preventDefault();
   }
 }, {passive:false});
@@ -293,6 +299,13 @@ const btnSound   = document.getElementById('btnSound');
 const btnMusic   = document.getElementById('btnMusic');
 const btnStart   = document.getElementById('btnStart');
 const startEl    = document.getElementById('start');
+const startTitle = startEl.querySelector('.title');
+const startSub   = startEl.querySelector('.sub');
+const startDefaults = {
+  title: startTitle.textContent,
+  sub: startSub.textContent,
+  btn: btnStart.textContent
+};
 
 btnPause.onclick = ()=>{
   const wasMusicOn = musicOn; // запоминаем текущую мелодию
@@ -333,12 +346,34 @@ btnMusic.onclick = ()=>{
     }
   }
 };
-btnStart.onclick = () => startGame();
+
+function hideStartOverlay(){
+  startTitle.textContent = startDefaults.title;
+  startSub.textContent   = startDefaults.sub;
+  btnStart.textContent   = startDefaults.btn;
+  startEl.style.display  = 'none';
+}
+
+function showGameOver(){
+  startTitle.textContent = 'Жизни закончились';
+  startSub.textContent   = 'Нажми «Заново», чтобы начать сначала';
+  btnStart.textContent   = 'Заново ↻';
+  startEl.style.display  = 'grid';
+}
+
+btnStart.onclick = () => {
+  if (gameOver){
+    hideStartOverlay();
+    restart();
+  } else {
+    startGame();
+  }
+};
 
 function startHidden(){ return startEl.style.display==='none'; }
 function startGame(){
   ensureAudio(); audioCtx.resume?.();
-  startEl.style.display='none';
+  hideStartOverlay();
   paused=false; btnPause.textContent='Пауза ⏸';
   if (!musicOn){
     startMusic();
@@ -348,7 +383,17 @@ function startGame(){
   loop();
 }
 function restart(){
-  score=0; lives=3; levelIndex=0; gameOver=false; HUD(); buildLevel(); if (musicOn) startMusic(); paused=false; frightened=0;
+  ensureAudio(); audioCtx.resume?.();
+  score=0; lives=3; levelIndex=0; gameOver=false; HUD(); buildLevel(); paused=false; frightened=0;
+  const wasMusicOn = musicOn || resumeMusic;
+  musicOn = wasMusicOn;
+  if (wasMusicOn){
+    startMusic();
+    btnMusic.textContent = `Мелодия ${melodyIndex+1} ⏹`;
+  } else {
+    btnMusic.textContent = 'Мелодия ♫';
+  }
+  resumeMusic=false;
   if (loopHandle){ cancelAnimationFrame(loopHandle); loopHandle=null; }
   loop();
 }
@@ -474,9 +519,12 @@ function update(){
         lives=Math.max(0,lives-1); HUD();
         if (lives<=0 && !gameOver){
           paused=true; gameOver=true; saveRecord(score);
-          setTimeout(()=>{
-            if (confirm('Жизни закончились. Начать заново?')) restart();
-          }, 0);
+          resumeMusic = musicOn;
+          if (musicOn){
+            stopMusic();
+            btnMusic.textContent = 'Мелодия ♫';
+          }
+          showGameOver();
         }
         else {
           // респавн в центр (не в стену)
