@@ -2,6 +2,11 @@ const tg = window.Telegram?.WebApp;
 const IS_TG = !!tg;
 const IS_IOS_TG = IS_TG && tg.platform === 'ios';
 
+if (window.Telegram && Telegram.WebApp) {
+  Telegram.WebApp.ready();
+  // Telegram.WebApp.expand(); // опционально
+}
+
 function applySafeArea(){
   if (!window.Telegram?.WebApp) return;              // снаружи Telegram — ничего не менять
   const tg = window.Telegram.WebApp;
@@ -17,8 +22,6 @@ function flipIfOverflow(el){
   if (r.right > window.innerWidth - 8) el.classList.add('align-left'); else el.classList.remove('align-left');
 }
 
-tg?.ready();
-tg?.expand();
 tg?.onEvent?.('viewportChanged', applySafeArea);
 window.addEventListener('resize', applySafeArea);
 applySafeArea();

@@ -235,13 +235,27 @@ async function saveRecord(finalScore){
       }
     }
 
-    // попытка отправить рекорд на бэкенд (если он настроен)
-    await fetch('api/records', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ username:name, score:finalScore })
-    }).catch(()=>{}); // тихо игнорируем ошибки сети
+    submitScore(finalScore);
   } catch(_){ }
+}
+
+async function submitScore(finalScore) {
+  try {
+    const { API_BASE } = await import('./config.js');
+    const initData = Telegram?.WebApp?.initData || '';
+    const res = await fetch(`${API_BASE}/score`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ initData, score: Number(finalScore) || 0 })
+    });
+    const data = await res.json();
+    if (data.ok === true) {
+      Telegram?.WebApp?.showPopup?.({ message: 'Очки сохранены' });
+    }
+  } catch (e) {
+    console.error('submitScore error', e);
+    Telegram?.WebApp?.showPopup?.({ message: 'Не удалось сохранить очки' });
+  }
 }
 
 // ===== Управление
