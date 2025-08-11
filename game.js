@@ -41,14 +41,18 @@ function tone(freq, dur, type='sine', gainNode=sfxGain){
 function startMusic(){
   ensureAudio();
   stopMusic(); musicOn = true;
-  const THEME = [523, 659, 784, 659, 587, 739, 880, 0, 523, 659, 784, 988]; // простая чиптуна
+  // более «залипательная» мелодия с басом и повторяющимся мотивом
+  const THEME = [523,659,784,659,880,988,880,784, 659,587,659,523,392,440,523,0];
   let i=0;
   musicTimer = setInterval(()=>{
     if (!musicOn) return;
     const n = THEME[i%THEME.length];
-    if (n>0) tone(n, 0.18, 'square', musicGain);
+    if (n>0){
+      tone(n,0.18,'square',musicGain);     // основная нота
+      tone(n/2,0.18,'sawtooth',musicGain); // лёгкий бас
+    }
     i++;
-  }, 200);
+  }, 180);
 }
 function stopMusic(){ musicOn=false; if (musicTimer) clearInterval(musicTimer); }
 
@@ -256,11 +260,11 @@ function stepActor(a){
   a.x += DIRS[a.dir].x * a.speed;
   a.y += DIRS[a.dir].y * a.speed;
 
-  // тоннели
-  if (a.x< -0.5) a.x = COLS-0.5;
-  if (a.x> COLS-0.5) a.x = -0.5;
-  if (a.y< -0.5) a.y = ROWS-0.5;
-  if (a.y> ROWS-0.5) a.y = -0.5;
+  // тоннели: корректная телепортация, чтобы не исчезать за краями
+  if (a.x <= -0.5) a.x += COLS;
+  else if (a.x >= COLS-0.5) a.x -= COLS;
+  if (a.y <= -0.5) a.y += ROWS;
+  else if (a.y >= ROWS-0.5) a.y -= ROWS;
 }
 
 function ghostAI(g){
