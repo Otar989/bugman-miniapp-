@@ -60,3 +60,14 @@ footer{padding:10px 14px;color:#8aa0c6;text-align:center;font-size:12px}
   padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.2s;
   box-shadow:0 6px 16px rgba(0,0,0,.25)}
 .btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.35)}
+
+/* таблица рекордов */
+.records{display:flex;justify-content:center;padding:10px}
+.records table{width:100%;max-width:480px;border-collapse:collapse}
+.records th,.records td{padding:8px 12px}
+.records th{background:#0b1430;color:var(--accent);text-align:left}
+.records tr:nth-child(odd){background:#0b1430}
+.records tr:nth-child(even){background:#101a34}
+.records .pos{text-align:right;color:var(--muted);width:40px}
+.records .score{text-align:right;font-weight:700}
+.records .name{font-weight:700}

@@ -209,13 +209,27 @@ function buildLevel(){
 buildLevel();
 
 // ===== HUD
-let levelIndex=0, score=0, lives=3, paused=false, frightened=0, tick=0;
+let levelIndex=0, score=0, lives=3, paused=false, frightened=0, tick=0, gameOver=false;
 let resumeMusic=false; // помнить состояние мелодии во время паузы
 let loopHandle=null;   // текущий кадр анимации
-function HUD(){ 
+function HUD(){
   document.getElementById('score').textContent=score;
   document.getElementById('lives').textContent=lives;
   document.getElementById('level').textContent=levelIndex+1;
+}
+
+function saveRecord(finalScore){
+  try {
+    const user = Telegram?.WebApp?.initDataUnsafe?.user;
+    const name = user?.username || user?.first_name || 'Безымянный';
+    if (typeof localStorage === 'undefined') return;
+    const records = JSON.parse(localStorage.getItem('records') || '[]');
+    const ex = records.find(r=>r.username===name);
+    if (!ex || finalScore>ex.score){
+      if (ex) ex.score = finalScore; else records.push({username:name, score:finalScore});
+      localStorage.setItem('records', JSON.stringify(records));
+    }
+  } catch(_){ }
 }
 
 // ===== Управление
@@ -322,7 +336,7 @@ function startGame(){
   loop();
 }
 function restart(){
-  score=0; lives=3; levelIndex=0; HUD(); buildLevel(); if (musicOn) startMusic(); paused=false; frightened=0;
+  score=0; lives=3; levelIndex=0; gameOver=false; HUD(); buildLevel(); if (musicOn) startMusic(); paused=false; frightened=0;
   if (loopHandle){ cancelAnimationFrame(loopHandle); loopHandle=null; }
   loop();
 }
@@ -446,7 +460,9 @@ function update(){
       } else if (pacman.alive){
         pacman.alive=false; tone(120,0.5,'square'); setTimeout(()=>tone(80,0.5,'sine'),150);
         lives=Math.max(0,lives-1); HUD();
-        if (lives<=0){ paused=true; }
+        if (lives<=0 && !gameOver){
+          paused=true; gameOver=true; saveRecord(score);
+        }
         else {
           // респавн в центр (не в стену)
           spawnPlayer();
