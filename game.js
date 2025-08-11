@@ -98,7 +98,7 @@ const WALL=1, EMPTY=0, DOT=2, POWER=3;
 let grid=[], pellets=0;
 
 // стартовые координаты (строго центр клетки)
-const spawn = { x:13.5, y:23.5, dir:'left' };
+const spawn = { x:14.5, y:24.5, dir:'left' };
 const ghosts = [
   {name:'Blinky', color:'#ff4b5c', x:13.5, y:14.5, dir:'left',  speed:0.095, mode:'chase'},
   {name:'Pinky',  color:'#ff7ad9', x:14.5, y:14.5, dir:'right', speed:0.090, mode:'chase'},
