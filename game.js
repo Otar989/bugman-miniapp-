@@ -41,14 +41,23 @@ function tone(freq, dur, type='sine', gainNode=sfxGain){
 function startMusic(){
   ensureAudio();
   stopMusic(); musicOn = true;
-  const THEME = [523, 659, 784, 659, 587, 739, 880, 0, 523, 659, 784, 988]; // простая чиптуна
+  // более заметная цикличная мелодия с паузами и простым басом
+  const THEME = [
+    523,0, 523,0, 659,0, 784,0,
+    659,0, 880,0, 988,0, 880,0,
+    784,0, 659,0, 587,0, 659,0,
+    523,0, 392,0, 440,0, 523,0
+  ];
   let i=0;
   musicTimer = setInterval(()=>{
     if (!musicOn) return;
     const n = THEME[i%THEME.length];
-    if (n>0) tone(n, 0.18, 'square', musicGain);
+    if (n>0){
+      tone(n,0.18,'square',musicGain);     // основная нота
+      tone(n/2,0.18,'sawtooth',musicGain); // лёгкий бас
+    }
     i++;
-  }, 200);
+  }, 180);
 }
 function stopMusic(){ musicOn=false; if (musicTimer) clearInterval(musicTimer); }
 
@@ -71,13 +80,13 @@ const RAW = [
 "1 1111 11 11111111 11 1111 1",
 "1      11    11    11      1",
 "11111  11111 11 11111  11111",
-"00001  11111 11 11111  10000",
-"00001  11          11  10000",
+"11111  11111 11 11111  11111",
+"11111  11          11  11111",
 "11111  11 111--111 11  11111",
 "     .    1G B P1    .      ",
 "11111  11 11111111 11  11111",
-"00001  11    22    11  10000",
-"00001  11 11111111 11  10000",
+"11111  11    22    11  11111",
+"11111  11 11111111 11  11111",
 "11111  11 11    11 11  11111",
 "1            11            1",
 "1 1111 11111 11 11111 1111 1",
@@ -98,7 +107,7 @@ const WALL=1, EMPTY=0, DOT=2, POWER=3;
 let grid=[], pellets=0;
 
 // стартовые координаты (строго центр клетки)
-const spawn = { x:13.5, y:23.5, dir:'left' };
+const spawn = { x:13.5, y:24.5, dir:'left' };
 const ghosts = [
   {name:'Blinky', color:'#ff4b5c', x:13.5, y:14.5, dir:'left',  speed:0.095, mode:'chase'},
   {name:'Pinky',  color:'#ff7ad9', x:14.5, y:14.5, dir:'right', speed:0.090, mode:'chase'},
@@ -110,6 +119,17 @@ const pacman = { x:spawn.x, y:spawn.y, dir:spawn.dir, nextDir:spawn.dir, speed:0
 function inBounds(c,r){ return c>=0&&c<COLS&&r>=0&&r<ROWS; }
 
 function buildLevel(){
+  // найти точку появления на карте (символ 'P'), если есть
+  for (let r=0;r<ROWS;r++){
+    const line = RAW[r] || "";
+    const c = line.indexOf('P');
+    if (c !== -1){
+      spawn.x = c + 0.5;
+      spawn.y = r + 0.5;
+      break;
+    }
+  }
+
   pellets=0;
   // первичный разбор: стены / «дверь» -- считаем стеной
   grid = Array.from({length:ROWS}, (_,r)=> Array.from({length:COLS}, (_,c)=>{
@@ -155,16 +175,18 @@ function buildLevel(){
   ghosts[1].x=14.5; ghosts[1].y=14.5; ghosts[1].dir='right';
   ghosts[2].x=13.5; ghosts[2].y=15.5; ghosts[2].dir='up';
   ghosts[3].x=14.5; ghosts[3].y=15.5; ghosts[3].dir='down';
+  // точка под пакманом съедается сразу, чтобы он начинал с поедания
+  eatAt(pacman.x, pacman.y);
 }
-buildLevel();
-
 // ===== HUD
 let levelIndex=0, score=0, lives=3, paused=false, frightened=0, tick=0;
-function HUD(){ 
+function HUD(){
   document.getElementById('score').textContent=score;
   document.getElementById('lives').textContent=lives;
   document.getElementById('level').textContent=levelIndex+1;
 }
+
+buildLevel();
 
 // ===== Управление
 const DIRS = {left:{x:-1,y:0}, right:{x:1,y:0}, up:{x:0,y:-1}, down:{x:0,y:1}};
@@ -224,9 +246,9 @@ function startHidden(){ return startEl.style.display==='none'; }
 function startGame(){
   ensureAudio(); audioCtx.resume?.();
   startEl.style.display='none';
-  paused=false; btnPause.textContent='Пауза ⏸';
+  btnPause.textContent='Пауза ⏸';
   if (!musicOn) startMusic();
-  loop();
+  restart();
 }
 function restart(){
   score=0; lives=3; levelIndex=0; HUD(); buildLevel(); paused=false; frightened=0; loop();
@@ -256,11 +278,11 @@ function stepActor(a){
   a.x += DIRS[a.dir].x * a.speed;
   a.y += DIRS[a.dir].y * a.speed;
 
-  // тоннели
-  if (a.x< -0.5) a.x = COLS-0.5;
-  if (a.x> COLS-0.5) a.x = -0.5;
-  if (a.y< -0.5) a.y = ROWS-0.5;
-  if (a.y> ROWS-0.5) a.y = -0.5;
+  // тоннели: корректная телепортация, чтобы не исчезать за краями
+  if (a.x <= -0.5) a.x += COLS;
+  else if (a.x >= COLS-0.5) a.x -= COLS;
+  if (a.y <= -0.5) a.y += ROWS;
+  else if (a.y >= ROWS-0.5) a.y -= ROWS;
 }
 
 function ghostAI(g){
