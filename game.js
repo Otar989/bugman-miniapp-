@@ -5,53 +5,7 @@ const ctx = canvas.getContext('2d', { alpha:false });
 
 // ===== Canvas / DPR
 let DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-const TILE = 24;
-
-// ===== Level
-// исходная карта уровня
-const RAW_BASE = [
-"1111111111111111111111111111",
-"1            11            1",
-"1 1111 11111 11 11111 1111 1",
-"1 1  1 1   1 11 1   1 1  1 1",
-"1 1111 11111 11 11111 1111 1",
-"1                        oo 1",
-"1 1111 11 11111111 11 1111 1",
-"1 1111 11 11111111 11 1111 1",
-"1      11    11    11      1",
-"11111  11111 11 11111  11111",
-"00001  11111 11 11111  10000",
-"00001  11          11  10000",
-"11111  11 111--111 11  11111",
-"     .    1G B P1    .      ",
-"11111  11 11111111 11  11111",
-"00001  11    22    11  10000",
-"00001  11 11111111 11  10000",
-"11111  11 11    11 11  11111",
-"1            11            1",
-"1 1111 11111 11 11111 1111 1",
-"1 1        1 11 1        1 1",
-"1  111111 11 11 11 111111  1",
-"1   22                22   1",
-"1 111111111111111111111111 1",
-"1            p             1",
-"1 1111111111 11 1111111111 1",
-"1                          1",
-"1 1111111111 11 1111111111 1",
-"1            11            1",
-"1                          1",
-"1111111111111111111111111111"
-];
-
-// '1' — стена, ' ' — проход; всё проходимое будет заполнено точками,
-// крупные точки добавим вручную после построения уровня.
-
-// уменьшаем сетку вдвое по обеим осям
-const RAW = RAW_BASE.filter((_, r) => r % 2 === 0)
-  .map(row => row.split('').filter((_, c) => c % 2 === 0).join(''));
-const COLS = RAW[0].length, ROWS = RAW.length;
-const centerX = COLS/2 - 0.5;
-const centerY = Math.floor(ROWS/2) - 0.5;
+const TILE = 24, COLS = 28, ROWS = 31;
 
 function fitCanvas(){
   const w = COLS*TILE, h = ROWS*TILE;
@@ -111,27 +65,54 @@ document.addEventListener('visibilitychange', ()=>{
   if (document.hidden) stopMusic();
 });
 
+// ===== Level
+// '1' — стена, ' ' — проход (пусто), всё проходимое будет заполнено обычными точками,
+// крупные точки добавим вручную.
+const RAW = [
+"1111111111111111111111111111",
+"1            11            1",
+"1 1111 11111 11 11111 1111 1",
+"1 1  1 1   1 11 1   1 1  1 1",
+"1 1111 11111 11 11111 1111 1",
+"1                        oo 1",
+"1 1111 11 11111111 11 1111 1",
+"1 1111 11 11111111 11 1111 1",
+"1      11    11    11      1",
+"11111  11111 11 11111  11111",
+"00001  11111 11 11111  10000",
+"00001  11          11  10000",
+"11111  11 111--111 11  11111",
+"     .    1G B P1    .      ",
+"11111  11 11111111 11  11111",
+"00001  11    22    11  10000",
+"00001  11 11111111 11  10000",
+"11111  11 11    11 11  11111",
+"1            11            1",
+"1 1111 11111 11 11111 1111 1",
+"1 1        1 11 1        1 1",
+"1  111111 11 11 11 111111  1",
+"1   22                22   1",
+"1 111111111111111111111111 1",
+"1            p             1",
+"1 1111111111 11 1111111111 1",
+"1                          1",
+"1 1111111111 11 1111111111 1",
+"1            11            1",
+"1                          1",
+"1111111111111111111111111111"
+];
 // нормализуем сетку
 const WALL=1, EMPTY=0, DOT=2, POWER=3;
 let grid=[], pellets=0;
 
 // стартовые координаты (строго центр клетки)
-let spawn = { x:centerX, y:ROWS-7.5, dir:'left' };
+let spawn = { x:13.5, y:23.5, dir:'left' };
 const ghosts = [
-  {name:'Blinky', color:'#ff4b5c', speed:0.095, mode:'chase'},
-  {name:'Pinky',  color:'#ff7ad9', speed:0.090, mode:'chase'},
-  {name:'Inky',   color:'#00d1d1', speed:0.088, mode:'chase'},
-  {name:'Clyde',  color:'#ffb84d', speed:0.085, mode:'chase'}
+  {name:'Blinky', color:'#ff4b5c', x:13.5, y:14.5, dir:'left',  speed:0.095, mode:'chase'},
+  {name:'Pinky',  color:'#ff7ad9', x:14.5, y:14.5, dir:'right', speed:0.090, mode:'chase'},
+  {name:'Inky',   color:'#00d1d1', x:13.5, y:15.5, dir:'up',    speed:0.088, mode:'chase'},
+  {name:'Clyde',  color:'#ffb84d', x:14.5, y:15.5, dir:'down',  speed:0.085, mode:'chase'}
 ];
-
-function resetGhosts(){
-  ghosts[0].x=centerX;   ghosts[0].y=centerY;   ghosts[0].dir='left';
-  ghosts[1].x=centerX+1; ghosts[1].y=centerY;   ghosts[1].dir='right';
-  ghosts[2].x=centerX;   ghosts[2].y=centerY+1; ghosts[2].dir='up';
-  ghosts[3].x=centerX+1; ghosts[3].y=centerY+1; ghosts[3].dir='down';
-}
-resetGhosts();
-
 const pacman = { x:spawn.x, y:spawn.y, dir:spawn.dir, nextDir:spawn.dir, speed:0.11, alive:true };
 
 function inBounds(c,r){ return c>=0&&c<COLS&&r>=0&&r<ROWS; }
@@ -220,7 +201,10 @@ function buildLevel(){
 
   // сброс позиций
   spawnPlayer();
-  resetGhosts();
+  ghosts[0].x=13.5; ghosts[0].y=14.5; ghosts[0].dir='left';
+  ghosts[1].x=14.5; ghosts[1].y=14.5; ghosts[1].dir='right';
+  ghosts[2].x=13.5; ghosts[2].y=15.5; ghosts[2].dir='up';
+  ghosts[3].x=14.5; ghosts[3].y=15.5; ghosts[3].dir='down';
 }
 buildLevel();
 
@@ -406,7 +390,7 @@ function ghostAI(g){
   } else if (idx===2) { // Inky — диагональная путаница
     tx += 2; ty -= 1;
   } else if (idx===3) { // Clyde — ближе к левой нижней
-    tx = pacman.x < COLS/2 ? 2 : COLS-3; ty = pacman.y > ROWS/2 ? ROWS-3 : 2;
+    tx = pacman.x<14 ? 2 : COLS-3; ty = pacman.y>15 ? ROWS-3 : 2;
   }
   // лёгкий рандом, чтобы не шли строем
   tx += (Math.random()-.5)*1.5; ty += (Math.random()-.5)*1.5;
@@ -458,7 +442,7 @@ function update(){
     if (dx*dx+dy*dy < 0.5){
       if (frightened>0){
         score+=200; HUD(); tone(150,0.22,'square');
-        g.x=centerX; g.y=centerY; g.dir='left';
+        g.x=13.5; g.y=14.5; g.dir='left';
       } else if (pacman.alive){
         pacman.alive=false; tone(120,0.5,'square'); setTimeout(()=>tone(80,0.5,'sine'),150);
         lives=Math.max(0,lives-1); HUD();
@@ -467,7 +451,10 @@ function update(){
           // респавн в центр (не в стену)
           spawnPlayer();
           frightened=0;
-          resetGhosts();
+          ghosts[0].x=13.5; ghosts[0].y=14.5; ghosts[0].dir='left';
+          ghosts[1].x=14.5; ghosts[1].y=14.5; ghosts[1].dir='right';
+          ghosts[2].x=13.5; ghosts[2].y=15.5; ghosts[2].dir='up';
+          ghosts[3].x=14.5; ghosts[3].y=15.5; ghosts[3].dir='down';
         }
       }
     }
