@@ -8,47 +8,49 @@
   <style>
     :root{
       --bg:#070b16; --panel:#0f1629; --accent:#ffd23f;
-      --text:#e6f0ff; --muted:#8aa0c6; --neon:#4a6dff;
+      --text:#e6f0ff; --muted:#8aa0c6;
     }
     *{box-sizing:border-box}
-    /* Полное отсутствие прокрутки страницы/вебвью */
+
+    /* телега-мобайл: прибиваем скролл вообще */
     html,body{
-      height:100%; margin:0; color:var(--text);
-      font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+      margin:0; height:100%;
       background:radial-gradient(1200px 500px at 70% -10%, #14264d 0%, #0a1124 55%, #070b16 100%);
-      overflow:hidden;                 /* не даём скроллить страницу */
-      overscroll-behavior:none;        /* глушим резиновый скролл */
-      position:fixed; inset:0;         /* iOS: убираем “протягивание” */
+      color:var(--text);
+      font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+      overflow:hidden;                /* нет прокрутки */
+      overscroll-behavior:none;       /* нет резинки */
+      position:fixed; inset:0;        /* iOS: нет «протягивания» */
     }
 
     .wrap{display:grid;grid-template-rows:auto 1fr auto;min-height:100%}
     header{
-      display:flex;gap:16px;align-items:center;justify-content:space-between;
+      display:flex;gap:14px;align-items:center;justify-content:space-between;
       padding:10px 14px;background:linear-gradient(180deg,var(--panel),#0c1324);
       border-bottom:1px solid #172344;position:sticky;top:0;z-index:5
     }
     .brand{display:flex;gap:10px;align-items:center}
     .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);
       box-shadow:0 0 18px 6px rgba(255,210,63,.6)}
-    h1{font-size:16px;letter-spacing:.8px;margin:0;font-weight:800}
-    .hud{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    h1{margin:0;font-size:16px;font-weight:800;letter-spacing:.6px}
+
+    .hud{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .chip{background:#0b1430;border:1px solid #1b2c56;border-radius:999px;
       padding:6px 10px;display:flex;align-items:center;gap:8px;font-weight:700}
-    .chip .dot{width:8px;height:8px;border-radius:50%;background:#2b3f72;
-      box-shadow:0 0 10px rgba(43,63,114,.6) inset}
+    .chip .dot{width:8px;height:8px;border-radius:50%;background:#2b3f72}
 
-    #game{display:grid;place-items:center;padding:8px}
+    #game{display:grid;place-items:center;padding:10px}
     canvas{
-      width:min(94vw,960px);
-      height:auto; aspect-ratio: 28 / 31;
+      width:min(96vw, 920px);
+      height:auto;
+      aspect-ratio: 28 / 31; /* ровно как сетка */
       max-height:78vh;
       background:#020817;border-radius:18px;
       box-shadow:0 12px 40px rgba(0,0,0,.45), inset 0 0 0 3px #0e1a36;
       outline:none;
 
-      /* ключевое — все жесты только внутрь игры */
-      touch-action:none;               /* запрещаем браузерные жесты */
-      overscroll-behavior:none;        /* и инерционный скролл контейнера */
+      touch-action:none;           /* все жесты — в игру */
+      overscroll-behavior:none;
     }
 
     .legend{padding:0 14px 14px;color:var(--muted);text-align:center;font-size:12px}
@@ -56,8 +58,8 @@
 
     /* стартовая плашка */
     .start{position:fixed;inset:0;display:grid;place-items:center;
-      background:rgba(3,6,14,.7);backdrop-filter:blur(3px);z-index:9}
-    .card{background:rgba(12,22,52,.95);border:1px solid #244;
+      background:rgba(3,6,14,.65);backdrop-filter:blur(2px);z-index:9}
+    .card{background:rgba(12,22,52,.96);border:1px solid #244;
       box-shadow:0 20px 60px rgba(0,0,0,.5);border-radius:18px;
       padding:20px;max-width:460px;text-align:center}
     .title{font-weight:900;font-size:20px;margin:0 0 6px}
@@ -76,10 +78,10 @@
       <div class="chip"><span class="dot"></span> Очки: <span id="score">0</span></div>
       <div class="chip"><span class="dot"></span> Уровень: <span id="level">1</span></div>
       <div class="chip"><span class="dot"></span> Жизни: <span id="lives">3</span></div>
-      <button id="btnPause" class="btn">Пауза ⏸</button>
+      <button id="btnPause"   class="btn">Пауза ⏸</button>
       <button id="btnRestart" class="btn">Заново ↻</button>
-      <button id="btnSound" class="btn">Звук 🔊</button>
-      <button id="btnMusic" class="btn">Мелодия ♫</button>
+      <button id="btnSound"   class="btn">Звук 🔊</button>
+      <button id="btnMusic"   class="btn">Мелодия ♫</button>
     </div>
   </header>
 
@@ -87,10 +89,7 @@
     <canvas id="canvas" width="672" height="744" tabindex="0" aria-label="Игровое поле Bugman"></canvas>
   </main>
 
-  <div class="legend">
-    Стрелки, WASD, свайпы (включая тачпад). Выход за край — вход с противоположного края.
-  </div>
-
+  <div class="legend">Стрелки / WASD, свайпы (включая тачпад). Выход за край — вход с противоположного края.</div>
   <footer>© 2025 — Bugman.</footer>
 </div>
 
@@ -98,38 +97,32 @@
 <div class="start" id="start">
   <div class="card">
     <p class="title">Нажми «Начать»</p>
-    <p class="sub">Активируются звук/музыка и управление.</p>
+    <p class="sub">Активируются звук/музыка и управление. Или просто нажми Enter.</p>
     <button id="btnStart" class="btn">Начать ▶</button>
-    <div style="margin-top:8px;color:#8aa0c6;font-size:12px;">или нажми Enter</div>
   </div>
 </div>
 
 <!-- Telegram Mini App SDK -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-  // Пытаемся выключить вертикальные свайпы самого Telegram WebView
-  try{
+  // пробуем отключить вертикальные свайпы самого WebView
+  try {
     Telegram?.WebApp?.ready?.();
     Telegram?.WebApp?.expand?.();
-    if (Telegram?.WebApp?.disableVerticalSwipes) {
-      Telegram.WebApp.disableVerticalSwipes();
-    }
-  }catch(_){}
+    Telegram?.WebApp?.disableVerticalSwipes?.();
+  } catch(_) {}
+  // на всякий случай фиксируем (0,0)
+  window.scrollTo(0,0);
+  addEventListener('scroll', ()=>scrollTo(0,0), {passive:true});
 </script>
 
 <!-- Игра -->
 <script src="./game.js"></script>
 
-<!-- Агрессивная блокировка прокрутки/свайпов в области игры -->
+<!-- Доп. блокировка системных жестов в области игры -->
 <script>
 (function(){
   const canvas = document.getElementById('canvas');
-
-  // Фиксируем страницу в (0,0) на всякий случай
-  window.scrollTo(0,0);
-  window.addEventListener('scroll', ()=> window.scrollTo(0,0), {passive:true});
-
-  // Любой touch внутри canvas — только для игры
   const stopIfCanvas = (e)=>{
     if (e.target === canvas || canvas.contains(e.target)) {
       e.preventDefault(); e.stopPropagation();
@@ -137,12 +130,7 @@
   };
   ['touchstart','touchmove','touchend','gesturestart','gesturechange','gestureend']
     .forEach(ev => document.addEventListener(ev, stopIfCanvas, {passive:false, capture:true}));
-
-  // На некоторых устройствах ещё помогает отмена wheel в canvas
   canvas.addEventListener('wheel', (e)=>{ e.preventDefault(); e.stopPropagation(); }, {passive:false});
-
-  // Если Телега не поддерживает disableVerticalSwipes, то этим мы блокируем
-  // «легкий» пан‑свайп своего контейнера.
 })();
 </script>
 </body>
