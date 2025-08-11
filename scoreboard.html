@@ -7,26 +7,30 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="app">
-  <header>
-    <div class="brand"><div class="dot"></div><h1>Bugman</h1></div>
-    <div class="hud">
-      <a href="index.html" class="btn">Назад ↩</a>
-    </div>
-  </header>
-  <main class="records">
-    <table>
-      <thead>
-        <tr><th>#</th><th>Игрок</th><th>Очки</th></tr>
-      </thead>
-      <tbody id="records"></tbody>
-    </table>
-  </main>
-  <footer>© 2025 — Bugman.</footer>
-</div>
+  <div class="app">
+    <header>
+      <div class="brand"><div class="dot"></div><h1>Bugman</h1></div>
+      <div class="hud">
+        <a href="index.html" class="btn">Назад ↩</a>
+      </div>
+    </header>
+    <main class="records">
+      <div id="loading" class="loading">Загрузка...</div>
+      <div id="empty" class="empty" style="display:none;">Пока нет рекордов</div>
+      <table id="recordsTable" style="display:none;">
+        <thead>
+          <tr><th>#</th><th>Игрок</th><th>Очки</th></tr>
+        </thead>
+        <tbody id="records"></tbody>
+      </table>
+      <div class="debug"><small>API: <span id="apiBase"></span></small></div>
+    </main>
+    <footer>© 2025 — Bugman.</footer>
+  </div>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="init.js"></script>
-<script src="scoreboard.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="init.js"></script>
+  <script type="module" src="config.js"></script>
+  <script type="module" src="scoreboard.js"></script>
 </body>
 </html>
