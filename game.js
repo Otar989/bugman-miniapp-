@@ -95,58 +95,94 @@ const RAW = [
 ];
 // нормализуем сетку
 const WALL=1, EMPTY=0, DOT=2, POWER=3;
-let grid=[], pellets=0;
 
-// стартовые координаты (строго центр клетки)
-const spawn = { x:13.5, y:23.5, dir:'left' };
+class Grid {
+  constructor(raw){
+    this.cols = COLS; this.rows = ROWS;
+    this.data = new Uint8Array(this.cols*this.rows);
+    for(let r=0;r<this.rows;r++){
+      for(let c=0;c<this.cols;c++){
+        const ch=(raw[r]||'')[c]||' ';
+        this.data[r*this.cols+c] = (ch==='1'||ch==='-')?WALL:EMPTY;
+      }
+    }
+  }
+  inBounds(c,r){ return c>=0&&c<this.cols&&r>=0&&r<this.rows; }
+  idx(c,r){ return r*this.cols + c; }
+  get(c,r){ return this.data[this.idx(c,r)]; }
+  set(c,r,v){ this.data[this.idx(c,r)] = v; }
+}
+
+let grid=null, pellets=0;
+
+// стартовые координаты вычислим после построения уровня
+let spawn = { x:0, y:0, dir:'left' };
 const ghosts = [
   {name:'Blinky', color:'#ff4b5c', x:13.5, y:14.5, dir:'left',  speed:0.095, mode:'chase'},
   {name:'Pinky',  color:'#ff7ad9', x:14.5, y:14.5, dir:'right', speed:0.090, mode:'chase'},
   {name:'Inky',   color:'#00d1d1', x:13.5, y:15.5, dir:'up',    speed:0.088, mode:'chase'},
   {name:'Clyde',  color:'#ffb84d', x:14.5, y:15.5, dir:'down',  speed:0.085, mode:'chase'}
 ];
-const pacman = { x:spawn.x, y:spawn.y, dir:spawn.dir, nextDir:spawn.dir, speed:0.11, alive:true };
+const ghostStartCells = ghosts.map(g=>[Math.floor(g.x), Math.floor(g.y)]);
+const pacman = { x:0, y:0, dir:'left', nextDir:'left', speed:0.11, alive:true };
 
 function inBounds(c,r){ return c>=0&&c<COLS&&r>=0&&r<ROWS; }
 
 function buildLevel(){
   pellets=0;
-  // первичный разбор: стены / «дверь» -- считаем стеной
-  grid = Array.from({length:ROWS}, (_,r)=> Array.from({length:COLS}, (_,c)=>{
-    const ch = (RAW[r]||'')[c] || ' ';
-    if (ch==='1' || ch==='-') return WALL;
-    return EMPTY; // всё остальное пока пусто
-  }));
+  grid = new Grid(RAW);
 
   // заполняем съедобное везде, где не стены и не «дом призраков»
   for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){
     // дом призраков: прямоугольник 11..16 / 10..17 — оставляем пустым
     const inHouse = (r>=11&&r<=16)&&(c>=10&&c<=17);
-    if (grid[r][c]!==WALL && !inHouse){
-      grid[r][c]=DOT; pellets++;
+    if (grid.get(c,r)!==WALL && !inHouse){
+      grid.set(c,r,DOT); pellets++;
     }
   }
   // крупные точки по углам
   const powers = [[1,1],[COLS-2,1],[1,ROWS-2],[COLS-2,ROWS-2]];
   for (const [c,r] of powers){
-    if (grid[r][c]!==WALL){ if (grid[r][c]===DOT) pellets--; grid[r][c]=POWER; pellets++; }
+    const t=grid.get(c,r);
+    if (t!==WALL){ if (t===DOT) pellets--; grid.set(c,r,POWER); pellets++; }
+  }
+
+  // находим ближайший свободный тайл к центру (BFS)
+  {
+    const centerC=Math.floor(COLS/2), centerR=Math.floor(ROWS/2);
+    const seen=Array.from({length:ROWS},()=>Array(COLS).fill(false));
+    const Q=[[centerC,centerR]];
+    seen[centerR][centerC]=true;
+    const ghostCells=new Set(ghostStartCells.map(([c,r])=>`${c},${r}`));
+    while(Q.length){
+      const [c,r]=Q.shift();
+      const tile=grid.get(c,r);
+      if ((tile===EMPTY||tile===DOT) && !ghostCells.has(`${c},${r}`)){
+        spawn={x:c+0.5,y:r+0.5,dir:'left'}; break;
+      }
+      for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+        const nc=c+dx, nr=r+dy;
+        if(inBounds(nc,nr) && !seen[nr][nc]){ seen[nr][nc]=true; Q.push([nc,nr]); }
+      }
+    }
   }
 
   // удаляем недостижимые точки (BFS от старта)
-  const seen = Array.from({length:ROWS}, ()=> Array(COLS).fill(false));
+  const seenReach = Array.from({length:ROWS}, ()=> Array(COLS).fill(false));
   const Q = [[Math.floor(spawn.x), Math.floor(spawn.y)]];
-  seen[Q[0][1]][Q[0][0]] = true;
+  seenReach[Q[0][1]][Q[0][0]] = true;
   while(Q.length){
     const [cx,cy]=Q.shift();
     for (const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
       const nx=cx+dx, ny=cy+dy;
-      if (inBounds(nx,ny) && !seen[ny][nx] && grid[ny][nx]!==WALL){
-        seen[ny][nx]=true; Q.push([nx,ny]);
+      if (inBounds(nx,ny) && !seenReach[ny][nx] && grid.get(nx,ny)!==WALL){
+        seenReach[ny][nx]=true; Q.push([nx,ny]);
       }
     }
   }
   for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){
-    if (!seen[r][c] && (grid[r][c]===DOT || grid[r][c]===POWER)){ grid[r][c]=EMPTY; pellets--; }
+    const t=grid.get(c,r);
+    if (!seenReach[r][c] && (t===DOT || t===POWER)){ grid.set(c,r,EMPTY); pellets--; }
   }
 
   // сброс позиций
@@ -235,7 +271,7 @@ function restart(){
 // ===== Движок тайлов
 function tileAt(x,y){ // x,y — целые клетки
   if (!inBounds(x,y)) return WALL;
-  return grid[y][x];
+  return grid.get(x,y);
 }
 function canGo(cx,cy,dir){ // из центра клетки
   const nx=cx+DIRS[dir].x, ny=cy+DIRS[dir].y;
@@ -314,8 +350,9 @@ function ghostAI(g){
 function eatAt(x,y){
   const c=Math.floor(x), r=Math.floor(y);
   if (!inBounds(c,r)) return;
-  if (grid[r][c]===DOT){ grid[r][c]=EMPTY; score+=10; pellets--; tone(600,0.05,'triangle'); HUD(); }
-  else if (grid[r][c]===POWER){ grid[r][c]=EMPTY; score+=50; pellets--; frightened=600; tone(220,0.20,'sawtooth'); HUD(); }
+  const t = grid.get(c,r);
+  if (t===DOT){ grid.set(c,r,EMPTY); score+=10; pellets--; tone(600,0.05,'triangle'); HUD(); }
+  else if (t===POWER){ grid.set(c,r,EMPTY); score+=50; pellets--; frightened=600; tone(220,0.20,'sawtooth'); HUD(); }
 }
 
 function nextLevel(){
@@ -373,7 +410,7 @@ function draw(){
   // лабиринт
   for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){
     const x=c*TILE, y=r*TILE;
-    if (grid[r][c]===WALL){
+    if (grid.get(c,r)===WALL){
       const g=ctx.createLinearGradient(x,y,x,y+TILE);
       g.addColorStop(0,'#193077'); g.addColorStop(1,'#0a183f');
       ctx.fillStyle=g; ctx.fillRect(x,y,TILE,TILE);
@@ -384,9 +421,10 @@ function draw(){
   // точки
   for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){
     const x=c*TILE+TILE/2, y=r*TILE+TILE/2;
-    if (grid[r][c]===DOT){
+    const t=grid.get(c,r);
+    if (t===DOT){
       ctx.fillStyle='#ffeaae'; ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
-    } else if (grid[r][c]===POWER){
+    } else if (t===POWER){
       ctx.fillStyle='#ffd23f'; ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2); ctx.fill();
       // лёгкое свечение
       const glow=ctx.createRadialGradient(x,y,2, x,y,18);
