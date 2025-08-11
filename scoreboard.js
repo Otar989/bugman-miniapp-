@@ -1,12 +1,4 @@
 (function(){
-  try {
-    Telegram?.WebApp?.ready?.();
-    Telegram?.WebApp?.expand?.();
-    Telegram?.WebApp?.disableVerticalSwipes?.();
-  } catch(_){ }
-  window.scrollTo(0,0);
-  addEventListener('scroll', ()=>scrollTo(0,0), {passive:true});
-
   const tbody = document.getElementById('records');
   let records = [];
   try {

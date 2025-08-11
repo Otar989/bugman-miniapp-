@@ -4,20 +4,30 @@
 }
 *{box-sizing:border-box}
 
-/* телега-мобайл: прибиваем скролл вообще */
+/* базовая разметка */
 html,body{
-  margin:0; height:100dvh;
+  margin:0;
   background:radial-gradient(1200px 500px at 70% -10%, #14264d 0%, #0a1124 55%, #070b16 100%);
   color:var(--text);
   font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-  overflow:hidden;                /* нет прокрутки */
-  overscroll-behavior:none;       /* нет резинки */
-  position:fixed; inset:0;        /* iOS: нет «протягивания» */
+}
+
+/* Telegram Mini App: полноэкранный режим без прокрутки */
+html.tg-app, html.tg-app body{
+  height:100dvh;
+  overflow:hidden;              /* нет прокрутки */
+  overscroll-behavior:none;     /* нет резинки */
+  position:fixed; inset:0;      /* iOS: нет «протягивания» */
+  touch-action:none;            /* запрет системных жестов */
 }
 
 .wrap{
   display:grid;
   grid-template-rows:auto 1fr auto auto;
+  min-height:100vh;
+}
+
+html.tg-app .wrap{
   height:100dvh;
   padding-left:env(safe-area-inset-left);  /* отступы под вырезы */
   padding-right:env(safe-area-inset-right);
