@@ -15,10 +15,20 @@ html,body{
   position:fixed; inset:0;        /* iOS: нет «протягивания» */
 }
 
-.wrap{display:grid;grid-template-rows:auto 1fr auto auto;height:100dvh}
+.wrap{
+  display:grid;
+  grid-template-rows:auto 1fr auto auto;
+  height:100dvh;
+  padding-left:env(safe-area-inset-left);  /* отступы под вырезы */
+  padding-right:env(safe-area-inset-right);
+}
 header{
   display:flex;gap:14px;align-items:center;justify-content:space-between;
-  padding:10px 14px;background:linear-gradient(180deg,var(--panel),#0c1324);
+  padding-top:calc(10px + env(safe-area-inset-top));
+  padding-bottom:10px;
+  padding-left:calc(14px + env(safe-area-inset-left));
+  padding-right:calc(14px + env(safe-area-inset-right));
+  background:linear-gradient(180deg,var(--panel),#0c1324);
   border-bottom:1px solid #172344;position:sticky;top:0;z-index:5
 }
 .brand{display:flex;gap:10px;align-items:center}
@@ -46,7 +56,13 @@ canvas{
 }
 
 .legend{padding:0 14px 14px;color:var(--muted);text-align:center;font-size:12px}
-footer{padding:10px 14px;color:#8aa0c6;text-align:center;font-size:12px}
+footer{
+  padding-top:10px;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom));
+  padding-left:calc(14px + env(safe-area-inset-left));
+  padding-right:calc(14px + env(safe-area-inset-right));
+  color:#8aa0c6;text-align:center;font-size:12px
+}
 
 /* стартовая плашка */
 .start{position:fixed;inset:0;display:grid;place-items:center;
@@ -62,7 +78,12 @@ footer{padding:10px 14px;color:#8aa0c6;text-align:center;font-size:12px}
 .btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.35)}
 
 /* таблица рекордов */
-.records{display:flex;justify-content:center;padding:10px}
+.records{
+  display:flex;
+  justify-content:center;
+  padding:10px;
+  overflow:auto; /* чтобы длинные списки прокручивались */
+}
 .records table{width:100%;max-width:480px;border-collapse:collapse}
 .records th,.records td{padding:8px 12px}
 .records th{background:#0b1430;color:var(--accent);text-align:left}
