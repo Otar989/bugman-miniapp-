@@ -1,41 +1,62 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Bugman — Mini App</title>
-<style>
-  :root{
-    --bg:#070b16; --panel:#0f1629; --accent:#ffd23f; --text:#e6f0ff; --muted:#8aa0c6;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:radial-gradient(1200px 500px at 70% -10%, #14264d 0%, #0a1124 55%, #070b16 100%);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
-  .wrap{display:grid;grid-template-rows:auto 1fr auto;min-height:100%}
-  header{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:10px 14px;background:linear-gradient(180deg,var(--panel),#0c1324);border-bottom:1px solid #172344;position:sticky;top:0;z-index:5}
-  .brand{display:flex;gap:10px;align-items:center}
-  .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px 6px rgba(255,210,63,.6)}
-  h1{font-size:16px;letter-spacing:.8px;margin:0;font-weight:800}
-  .hud{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-  .chip{background:#0b1430;border:1px solid #1b2c56;border-radius:999px;padding:6px 10px;display:flex;align-items:center;gap:8px;font-weight:700}
-  .chip .dot{width:8px;height:8px;border-radius:50%;background:#2b3f72;box-shadow:0 0 10px rgba(43,63,114,.6) inset}
-  #game{display:grid;place-items:center;padding:12px}
-  canvas{width:min(96vw,900px);height:calc(min(96vw,900px)*.9);max-height:78vh;background:#020817;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.45), inset 0 0 0 3px #0e1a36;outline:none;touch-action:none}
-  footer{padding:10px 14px;color:#8aa0c6;text-align:center;font-size:12px}
-  .legend{padding:0 14px 14px;color:#8aa0c6;text-align:center;font-size:12px}
+  <meta charset="utf-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Bugman</title>
+  <style>
+    :root{
+      --bg:#070b16; --panel:#0f1629; --accent:#ffd23f;
+      --text:#e6f0ff; --muted:#8aa0c6; --neon:#4a6dff;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;color:var(--text);
+      font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+      background:radial-gradient(1200px 500px at 70% -10%, #14264d 0%, #0a1124 55%, #070b16 100%);
+      overflow:hidden;                 /* гасим прокрутку всей страницы */
+      overscroll-behavior:none;        /* гасим pull-to-refresh/свайпы контейнера */
+    }
+    .wrap{display:grid;grid-template-rows:auto 1fr auto;min-height:100%}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;
+      padding:10px 14px;background:linear-gradient(180deg,var(--panel),#0c1324);
+      border-bottom:1px solid #172344;position:sticky;top:0;z-index:5}
+    .brand{display:flex;gap:10px;align-items:center}
+    .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);
+      box-shadow:0 0 18px 6px rgba(255,210,63,.6)}
+    h1{font-size:16px;letter-spacing:.8px;margin:0;font-weight:800}
+    .hud{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .chip{background:#0b1430;border:1px solid #1b2c56;border-radius:999px;
+      padding:6px 10px;display:flex;align-items:center;gap:8px;font-weight:700}
+    .chip .dot{width:8px;height:8px;border-radius:50%;background:#2b3f72;
+      box-shadow:0 0 10px rgba(43,63,114,.6) inset}
+    #game{display:grid;place-items:center;padding:8px}
+    canvas{
+      width:min(94vw,960px);
+      /* на телефоне крупнее */
+      height:auto; aspect-ratio: 28 / 31;
+      max-height:78vh;
+      background:#020817;border-radius:18px;
+      box-shadow:0 12px 40px rgba(0,0,0,.45), inset 0 0 0 3px #0e1a36;
+      outline:none;
+      touch-action:none;              /* жесты идут в игру, а не в скролл */
+    }
+    .legend{padding:0 14px 14px;color:var(--muted);text-align:center;font-size:12px}
+    footer{padding:10px 14px;color:#8aa0c6;text-align:center;font-size:12px}
 
-  /* стартовый оверлей */
-  .start{position:fixed;inset:0;display:grid;place-items:center;background:rgba(3,6,14,.7);backdrop-filter:blur(3px);z-index:9}
-  .card{background:rgba(12,22,52,.95);border:1px solid #244;box-shadow:0 20px 60px rgba(0,0,0,.5);border-radius:18px;padding:20px;max-width:460px;text-align:center}
-  .title{font-weight:900;font-size:24px;margin:0 0 8px}
-  .sub{color:#a9b9df;margin:0 0 16px}
-  .btn{appearance:none;border:1px solid #1b2c56;background:#0b1430;color:var(--text);padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.2s;box-shadow:0 6px 16px rgba(0,0,0,.25)}
-  .btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.35)}
-
-  /* мобильный масштаб — чуть крупнее */
-  @media (max-width: 520px){
-    canvas{width:96vw;height:112vw;max-height:none}
-  }
-</style>
+    /* стартовая плашка */
+    .start{position:fixed;inset:0;display:grid;place-items:center;
+      background:rgba(3,6,14,.7);backdrop-filter:blur(3px);z-index:9}
+    .card{background:rgba(12,22,52,.95);border:1px solid #244;
+      box-shadow:0 20px 60px rgba(0,0,0,.5);border-radius:18px;
+      padding:20px;max-width:460px;text-align:center}
+    .title{font-weight:900;font-size:20px;margin:0 0 6px}
+    .sub{color:#a9b9df;margin:0 0 14px}
+    .btn{appearance:none;border:1px solid #1b2c56;background:#0b1430;color:var(--text);
+      padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.2s;
+      box-shadow:0 6px 16px rgba(0,0,0,.25)}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.35)}
+  </style>
 </head>
 <body>
 <div class="wrap">
@@ -45,10 +66,10 @@
       <div class="chip"><span class="dot"></span> Очки: <span id="score">0</span></div>
       <div class="chip"><span class="dot"></span> Уровень: <span id="level">1</span></div>
       <div class="chip"><span class="dot"></span> Жизни: <span id="lives">3</span></div>
-      <button id="btnPause" class="btn" tabindex="-1">Пауза ⏸</button>
-      <button id="btnRestart" class="btn" tabindex="-1">Заново ↻</button>
-      <button id="btnSound" class="btn" tabindex="-1">Звук 🔊</button>
-      <button id="btnMusic" class="btn" tabindex="-1">Мелодия ♫</button>
+      <button id="btnPause" class="btn">Пауза ⏸</button>
+      <button id="btnRestart" class="btn">Заново ↻</button>
+      <button id="btnSound" class="btn">Звук 🔊</button>
+      <button id="btnMusic" class="btn">Мелодия ♫</button>
     </div>
   </header>
 
@@ -56,21 +77,24 @@
     <canvas id="canvas" width="672" height="744" tabindex="0" aria-label="Игровое поле Bugman"></canvas>
   </main>
 
-  <div class="legend">Стрелки, свайпы (включая тачпад). Выход за край — вход с противоположного края.</div>
+  <div class="legend">
+    Стрелки, WASD, свайпы (включая тачпад). Выход за край — вход с противоположного края.
+  </div>
+
   <footer>© 2025 — Bugman.</footer>
 </div>
 
+<!-- стартовая плашка -->
 <div class="start" id="start">
   <div class="card">
     <p class="title">Нажми «Начать»</p>
-    <p class="sub">Активируются звук/музыка и управление. Enter/Space тоже работают.</p>
-    <button id="btnStart" class="btn" tabindex="-1">Начать ▶</button>
+    <p class="sub">Активируются звук/музыка и управление.</p>
+    <button id="btnStart" class="btn">Начать ▶</button>
+    <div style="margin-top:8px;color:#8aa0c6;font-size:12px;">или нажми Enter</div>
   </div>
 </div>
 
-<script src="game.js"></script>
-
-<!-- Telegram Mini App SDK (не мешает в вебе) -->
+<!-- Telegram Mini App SDK -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
   if (window.Telegram && Telegram.WebApp) {
@@ -79,9 +103,14 @@
     const tp = Telegram.WebApp.themeParams || {};
     if (tp.secondary_bg_color) document.documentElement.style.setProperty('--panel', tp.secondary_bg_color);
     if (tp.text_color) document.documentElement.style.setProperty('--text', tp.text_color);
-    Telegram.WebApp.BackButton.onClick(() => Telegram.WebApp.close());
-    Telegram.WebApp.BackButton.show();
+    // Если доступно — гасим вертикальные свайпы самого webview
+    if (Telegram.WebApp.disableVerticalSwipes) {
+      Telegram.WebApp.disableVerticalSwipes();
+    }
   }
 </script>
+
+<!-- Вся логика игры -->
+<script src="./game.js"></script>
 </body>
 </html>
