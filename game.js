@@ -97,15 +97,16 @@ const RAW = [
 const WALL=1, EMPTY=0, DOT=2, POWER=3;
 let grid=[], pellets=0;
 
-// стартовые координаты (строго центр клетки)
-const spawn = { x:14.5, y:24.5, dir:'left' };
+// стартовые координаты вычислим после построения уровня
+let spawn = { x:0, y:0, dir:'left' };
 const ghosts = [
   {name:'Blinky', color:'#ff4b5c', x:13.5, y:14.5, dir:'left',  speed:0.095, mode:'chase'},
   {name:'Pinky',  color:'#ff7ad9', x:14.5, y:14.5, dir:'right', speed:0.090, mode:'chase'},
   {name:'Inky',   color:'#00d1d1', x:13.5, y:15.5, dir:'up',    speed:0.088, mode:'chase'},
   {name:'Clyde',  color:'#ffb84d', x:14.5, y:15.5, dir:'down',  speed:0.085, mode:'chase'}
 ];
-const pacman = { x:spawn.x, y:spawn.y, dir:spawn.dir, nextDir:spawn.dir, speed:0.11, alive:true };
+const ghostStartCells = ghosts.map(g=>[Math.floor(g.x), Math.floor(g.y)]);
+const pacman = { x:0, y:0, dir:'left', nextDir:'left', speed:0.11, alive:true };
 
 function inBounds(c,r){ return c>=0&&c<COLS&&r>=0&&r<ROWS; }
 
@@ -132,21 +133,40 @@ function buildLevel(){
     if (grid[r][c]!==WALL){ if (grid[r][c]===DOT) pellets--; grid[r][c]=POWER; pellets++; }
   }
 
+  // находим ближайший свободный тайл к центру (BFS)
+  {
+    const centerC=Math.floor(COLS/2), centerR=Math.floor(ROWS/2);
+    const seen=Array.from({length:ROWS},()=>Array(COLS).fill(false));
+    const Q=[[centerC,centerR]];
+    seen[centerR][centerC]=true;
+    const ghostCells=new Set(ghostStartCells.map(([c,r])=>`${c},${r}`));
+    while(Q.length){
+      const [c,r]=Q.shift();
+      if ((grid[r][c]===EMPTY||grid[r][c]===DOT) && !ghostCells.has(`${c},${r}`)){
+        spawn={x:c+0.5,y:r+0.5,dir:'left'}; break;
+      }
+      for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+        const nc=c+dx, nr=r+dy;
+        if(inBounds(nc,nr) && !seen[nr][nc]){ seen[nr][nc]=true; Q.push([nc,nr]); }
+      }
+    }
+  }
+
   // удаляем недостижимые точки (BFS от старта)
-  const seen = Array.from({length:ROWS}, ()=> Array(COLS).fill(false));
+  const seenReach = Array.from({length:ROWS}, ()=> Array(COLS).fill(false));
   const Q = [[Math.floor(spawn.x), Math.floor(spawn.y)]];
-  seen[Q[0][1]][Q[0][0]] = true;
+  seenReach[Q[0][1]][Q[0][0]] = true;
   while(Q.length){
     const [cx,cy]=Q.shift();
     for (const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
       const nx=cx+dx, ny=cy+dy;
-      if (inBounds(nx,ny) && !seen[ny][nx] && grid[ny][nx]!==WALL){
-        seen[ny][nx]=true; Q.push([nx,ny]);
+      if (inBounds(nx,ny) && !seenReach[ny][nx] && grid[ny][nx]!==WALL){
+        seenReach[ny][nx]=true; Q.push([nx,ny]);
       }
     }
   }
   for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){
-    if (!seen[r][c] && (grid[r][c]===DOT || grid[r][c]===POWER)){ grid[r][c]=EMPTY; pellets--; }
+    if (!seenReach[r][c] && (grid[r][c]===DOT || grid[r][c]===POWER)){ grid[r][c]=EMPTY; pellets--; }
   }
 
   // сброс позиций
