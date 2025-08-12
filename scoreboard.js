@@ -39,7 +39,7 @@ function renderTable(items, offset = 0) {
       }
       const scoreTd = document.createElement('td');
       scoreTd.className = 'score';
-      scoreTd.textContent = item.score;
+      scoreTd.textContent = item.best_score;
       tr.append(pos, nameTd, scoreTd);
       tbody.appendChild(tr);
     });
