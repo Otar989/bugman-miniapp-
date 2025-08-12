@@ -8,27 +8,22 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="app">
-  <header>
+<div id="app">
+  <header id="hud">
     <div class="brand"><div class="dot"></div><h1>Bugman</h1></div>
-    <div class="hud">
-      <div class="chip"><span class="dot"></span> Очки: <span id="score">0</span></div>
-      <div class="chip"><span class="dot"></span> Уровень: <span id="level">1</span></div>
-      <div class="chip"><span class="dot"></span> Жизни: <span id="lives">3</span></div>
-      <button id="btnPause"   class="btn">Пауза ⏸</button>
-      <button id="btnRestart" class="btn">Заново ↻</button>
-      <button id="btnSound"   class="btn">Звук 🔊</button>
-      <button id="btnMusic"   class="btn">Мелодия ♫</button>
-      <a href="scoreboard.html" class="btn">Рекорды 🏆</a>
-    </div>
+    <div class="chip"><span class="dot"></span> Очки: <span id="score">0</span></div>
+    <div class="chip"><span class="dot"></span> Уровень: <span id="level">1</span></div>
+    <div class="chip"><span class="dot"></span> Жизни: <span id="lives">3</span></div>
+    <button id="btnPause"   class="btn">Пауза ⏸</button>
+    <button id="btnRestart" class="btn">Заново ↻</button>
+    <button id="btnSound"   class="btn">Звук 🔊</button>
+    <button id="btnMusic"   class="btn">Мелодия ♫</button>
+    <a href="scoreboard.html" class="btn">Рекорды 🏆</a>
   </header>
 
-  <main id="game">
-    <canvas id="canvas" width="672" height="744" tabindex="0" aria-label="Игровое поле Bugman"></canvas>
+  <main id="stage">
+    <canvas id="game" tabindex="0" aria-label="Игровое поле Bugman"></canvas>
   </main>
-
-  <div class="legend">Стрелки / WASD, свайпы (включая тачпад). Выход за край — вход с противоположного края.</div>
-  <footer>© 2025 — Bugman.</footer>
 </div>
 
 <!-- стартовая плашка -->
@@ -51,7 +46,7 @@
 <!-- Доп. блокировка системных жестов в области игры -->
 <script>
 (function(){
-  const canvas = document.getElementById('canvas');
+  const canvas = document.getElementById('game');
   const stopIfCanvas = (e)=>{
     if (e.target === canvas || canvas.contains(e.target)) {
       e.preventDefault();

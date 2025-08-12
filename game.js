@@ -1,23 +1,65 @@
 /* Bugman — core */
 
-const canvas = document.getElementById('canvas');
+const tg = window.Telegram?.WebApp;
+let DPR = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+const COLS = 28, ROWS = 31;
+const app = document.getElementById('app');
+const stage = document.getElementById('stage');
+const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d', { alpha:false });
+let TILE = 24;
 
-// ===== Canvas / DPR
-let DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-const TILE = 24, COLS = 28, ROWS = 31;
-
-function fitCanvas(){
-  DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-  const w = COLS*TILE, h = ROWS*TILE;
-  canvas.width  = Math.round(w * DPR);
-  canvas.height = Math.round(h * DPR);
-  canvas.style.aspectRatio = `${w}/${h}`;
-  ctx.setTransform(DPR,0,0,DPR,0,0);
+function getViewportHeight(){
+  if (tg && tg.viewportStableHeight) return tg.viewportStableHeight;
+  return window.innerHeight;
 }
-fitCanvas();
-addEventListener('resize', fitCanvas);
-globalThis.Telegram?.WebApp?.onEvent?.('viewportChanged', fitCanvas);
+
+function layout(){
+  const hud = document.getElementById('hud');
+  const appW = app.clientWidth;
+  const appH = getViewportHeight();
+  const hudH = hud?.offsetHeight || 0;
+
+  const stageW = appW;
+  const stageH = appH - hudH;
+
+  const tileW = Math.floor(stageW / COLS);
+  const tileH = Math.floor(stageH / ROWS);
+  const tile = Math.max(1, Math.min(tileW, tileH));
+
+  const drawW = tile * COLS;
+  const drawH = tile * ROWS;
+
+  DPR = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+
+  canvas.width  = drawW * DPR;
+  canvas.height = drawH * DPR;
+  canvas.style.width  = `${drawW}px`;
+  canvas.style.height = `${drawH}px`;
+
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+
+  stage.style.gridTemplateColumns = `${drawW}px`;
+  stage.style.gridTemplateRows = `${drawH}px`;
+
+  TILE = tile;
+
+  if (typeof ctx.clearRect === 'function' && typeof ctx.createLinearGradient === 'function') draw();
+}
+
+let raf;
+function safeLayout(){
+  const rAF = globalThis.requestAnimationFrame || setTimeout;
+  const cAF = globalThis.cancelAnimationFrame || clearTimeout;
+  cAF(raf);
+  raf = rAF(layout);
+}
+
+window.addEventListener('resize', safeLayout);
+window.addEventListener('orientationchange', () => setTimeout(safeLayout,50));
+if (tg) tg.onEvent('viewportChanged', safeLayout);
+
+safeLayout();
 
 // ===== Audio (минимум, чтобы не падало без жеста)
 let audioCtx, master, sfxGain, musicGain, musicTimer=null, musicOn=false, melodyIndex=0, audioEnabled=true;

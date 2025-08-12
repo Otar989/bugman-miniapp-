@@ -6,15 +6,13 @@
   <title>Bugman — рекорды</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <div class="app">
-    <header>
-      <div class="brand"><div class="dot"></div><h1>Bugman</h1></div>
-      <div class="hud">
+  <body>
+    <div id="app">
+      <header id="hud">
+        <div class="brand"><div class="dot"></div><h1>Bugman</h1></div>
         <a href="index.html" class="btn">Назад ↩</a>
-      </div>
-    </header>
-    <main class="records">
+      </header>
+      <main class="records">
       <div id="loading" class="loading">Загрузка...</div>
       <div id="empty" class="empty" style="display:none;">Пока нет рекордов</div>
       <table id="recordsTable" style="display:none;">
@@ -24,8 +22,8 @@
         <tbody id="records"></tbody>
       </table>
     </main>
-    <footer>© 2025 — Bugman.</footer>
-  </div>
+      <footer>© 2025 — Bugman.</footer>
+    </div>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="init.js"></script>
