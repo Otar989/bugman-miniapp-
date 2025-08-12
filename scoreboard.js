@@ -1,16 +1,6 @@
 import { API_BASE } from "./config.js";
 import { submitScore, toast } from "./api.js";
 
-function escapeHTML(str = "") {
-  return str.replace(/[&<>"']/g, c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }[c]));
-}
-
 const tbody = document.getElementById('records');
 const table = document.getElementById('recordsTable');
 const empty = document.getElementById('empty');
@@ -26,20 +16,24 @@ function renderTable(items, offset = 0) {
       pos.textContent = i + 1 + offset;
       const nameTd = document.createElement('td');
       nameTd.className = 'name';
-      const name = item.display_name || item.username || 'Player';
+      const defaultName = `Player ${(item.id ?? item.user_id ?? i + 1 + offset).toString().padStart(4, '0')}`;
+      let name = item.username || item.first_name || item.last_name || defaultName;
+      if (name.length > 24) {
+        name = name.slice(0, 24) + '…';
+      }
       if (item.username) {
         const a = document.createElement('a');
         a.href = `https://t.me/${item.username}`;
         a.target = '_blank';
         a.rel = 'noopener';
-        a.innerHTML = escapeHTML(name);
+        a.textContent = name;
         nameTd.appendChild(a);
       } else {
-        nameTd.innerHTML = escapeHTML(name);
+        nameTd.textContent = name;
       }
       const scoreTd = document.createElement('td');
       scoreTd.className = 'score';
-      scoreTd.textContent = item.best_score;
+      scoreTd.textContent = item.best_score ?? 0;
       tr.append(pos, nameTd, scoreTd);
       tbody.appendChild(tr);
     });
