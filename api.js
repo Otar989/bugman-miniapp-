@@ -1,30 +1,43 @@
 import { API_BASE } from "./config.js";
 
+function toast(message) {
+  try {
+    Telegram?.WebApp?.showPopup?.({ message: String(message) });
+  } catch (_) {
+    // fallback for non-Telegram environments
+    console.log(message);
+  }
+}
+
 let lastSubmitAt = 0;
 export async function submitScore(score) {
+  const initData = Telegram?.WebApp?.initData || "";
+  if (!initData) {
+    toast("Откройте игру внутри Telegram");
+    return;
+  }
   const now = Date.now();
   if (now - lastSubmitAt < 2000) return;
   lastSubmitAt = now;
-
-  const initData = Telegram?.WebApp?.initData || "";
-  if (!initData) {
-    Telegram?.WebApp?.showPopup?.({ message: "Открой игру внутри Telegram" });
-    return;
-  }
   try {
     const res = await fetch(`${API_BASE}/score`, {
       method: "POST",
+      mode: "cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ initData, score: Number(score) || 0 })
     });
-    if (!res.ok) throw new Error("bad status" + res.status);
+    const data = await res.json();
+    if (!res.ok || data?.ok === false) {
+      const reason = data?.reason || data?.error || `HTTP ${res.status}`;
+      toast(`Не удалось сохранить: ${reason}`);
+      return;
+    }
+    // toast("Очки сохранены");
   } catch (e) {
-    Telegram?.WebApp?.showPopup?.({ message: "Не удалось сохранить" });
+    toast("Не удалось сохранить: сеть/сервер");
+    console.error(e);
   }
 }
 
-export async function loadLeaderboard(limit = 100, offset = 0) {
-  const res = await fetch(`${API_BASE}/leaderboard?limit=${limit}&offset=${offset}&_=${Date.now()}`);
-  if (!res.ok) throw new Error("bad status" + res.status);
-  return res.json();
-}
+export { toast };
+
