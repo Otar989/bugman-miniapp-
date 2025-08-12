@@ -299,11 +299,6 @@ addEventListener('keydown', (e)=>{
     document.getElementById('btnPause').click();
     e.preventDefault();
   }
-  else if (e.key==='Enter'){
-    if (!startHidden()) btnStart.click();
-    else restart();
-    e.preventDefault();
-  }
 }, {passive:false});
 
 // свайпы: палец и тачпад
@@ -393,23 +388,9 @@ function showGameOver(){
   gate.hidden = false;
 }
 
-btnStart.addEventListener('click', (e) => {
-  e.preventDefault();
-  ensureAudio(); audioCtx.resume?.();
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    if (gameOver){
-      hideStartOverlay();
-      restart();
-    } else {
-      startGame();
-    }
-  }));
-});
-
 // Если TG меняет высоту/ориентацию — не возвращаем модалку случайно
 tg?.onEvent?.('viewportChanged', () => {});
 
-function startHidden(){ return gate.hidden; }
 function startGame(){
   ensureAudio(); audioCtx.resume?.();
   hideStartOverlay();
@@ -436,6 +417,54 @@ function restart(){
   if (loopHandle){ cancelAnimationFrame(loopHandle); loopHandle=null; }
   loop();
 }
+
+// Старт игры по кнопке/Enter/Telegram MainButton
+(()=> {
+  const tg = window.Telegram?.WebApp;
+
+  async function unlockAudio(){
+    try { if (window.Howler?.ctx?.state === 'suspended') await Howler.ctx.resume(); } catch {}
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) {
+        window._actx = window._actx || new AC();
+        if (window._actx.state === 'suspended') await window._actx.resume();
+      }
+    } catch {}
+    try { ensureAudio(); if (audioCtx?.state === 'suspended') await audioCtx.resume(); } catch {}
+  }
+
+  async function startHandler(){
+    if (gate.hidden) return;
+    gate.setAttribute('hidden','');
+    await unlockAudio();
+    if (gameOver) restart(); else startGame();
+  }
+
+  function wireStart(){
+    const btn = document.getElementById('btnStart');
+    btn?.addEventListener('click', e => { e.preventDefault(); startHandler(); }, { once:true });
+  }
+
+  document.addEventListener('click', e => {
+    if (!gate.hidden && e.target.closest('#btnStart')) {
+      e.preventDefault(); startHandler();
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.code === 'Enter') && !gate.hidden) {
+      e.preventDefault(); startHandler();
+    }
+  });
+
+  tg?.onEvent?.('mainButtonClicked', startHandler);
+
+  if (document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', wireStart, { once:true });
+  else
+    wireStart();
+})();
 
 // ===== Движок тайлов
 function tileAt(x,y){ // x,y — целые клетки
