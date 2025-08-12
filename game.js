@@ -221,11 +221,9 @@ function HUD(){
 }
 
 async function saveRecord(finalScore){
+  const user = Telegram?.WebApp?.initDataUnsafe?.user;
+  const name = user?.username || user?.first_name || 'Безымянный';
   try {
-    const user = Telegram?.WebApp?.initDataUnsafe?.user;
-    const name = user?.username || user?.first_name || 'Безымянный';
-
-    // локальное хранилище — fallback, чтобы рекорд сохранялся даже без сервера
     if (typeof localStorage !== 'undefined'){
       const records = JSON.parse(localStorage.getItem('records') || '[]');
       const ex = records.find(r=>r.username===name);
@@ -235,8 +233,10 @@ async function saveRecord(finalScore){
       }
       localStorage.setItem('lastKnownScore', finalScore);
     }
+  } catch(_){ }
+  try {
     const { submitScore } = await import('./api.js');
-    submitScore(finalScore);
+    await submitScore(finalScore);
   } catch(_){ }
 }
 
