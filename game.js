@@ -233,29 +233,11 @@ async function saveRecord(finalScore){
         if (ex) ex.score = finalScore; else records.push({username:name, score:finalScore});
         localStorage.setItem('records', JSON.stringify(records));
       }
+      localStorage.setItem('lastKnownScore', finalScore);
     }
-
+    const { submitScore } = await import('./api.js');
     submitScore(finalScore);
   } catch(_){ }
-}
-
-async function submitScore(finalScore) {
-  try {
-    const { API_BASE } = await import('./config.js');
-    const initData = Telegram?.WebApp?.initData || '';
-    const res = await fetch(`${API_BASE}/score`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ initData, score: Number(finalScore) || 0 })
-    });
-    const data = await res.json();
-    if (data.ok === true) {
-      Telegram?.WebApp?.showPopup?.({ message: 'Очки сохранены' });
-    }
-  } catch (e) {
-    console.error('submitScore error', e);
-    Telegram?.WebApp?.showPopup?.({ message: 'Не удалось сохранить очки' });
-  }
 }
 
 // ===== Управление

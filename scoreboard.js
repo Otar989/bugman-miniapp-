@@ -1,6 +1,16 @@
-import { API_BASE } from "./config.js";
+import { loadLeaderboard, submitScore } from "./api.js";
 
-async function loadLeaderboard(limit = 100, offset = 0) {
+function escapeHTML(str = "") {
+  return str.replace(/[&<>"']/g, c => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[c]));
+}
+
+async function renderBoard(limit = 100, offset = 0) {
   const tbody = document.getElementById('records');
   const table = document.getElementById('recordsTable');
   const empty = document.getElementById('empty');
@@ -9,30 +19,30 @@ async function loadLeaderboard(limit = 100, offset = 0) {
     loading.style.display = 'block';
     table.style.display = 'none';
     empty.style.display = 'none';
-    const res = await fetch(`${API_BASE}/leaderboard?limit=${limit}&offset=${offset}`);
-    const { items } = await res.json();
+    const { items } = await loadLeaderboard(limit, offset);
     tbody.innerHTML = '';
     if (Array.isArray(items) && items.length > 0) {
-      items.forEach((r, i) => {
+      items.forEach((item, i) => {
         const tr = document.createElement('tr');
         const pos = document.createElement('td');
         pos.className = 'pos';
         pos.textContent = i + 1 + offset;
         const nameTd = document.createElement('td');
         nameTd.className = 'name';
-        const display = r.display_name || '';
-        if (r.username) {
+        const name = item.display_name || item.username || 'Player';
+        if (item.username) {
           const a = document.createElement('a');
-          a.href = `https://t.me/${r.username}`;
-          a.textContent = display;
+          a.href = `https://t.me/${item.username}`;
           a.target = '_blank';
+          a.rel = 'noopener';
+          a.innerHTML = escapeHTML(name);
           nameTd.appendChild(a);
         } else {
-          nameTd.textContent = display;
+          nameTd.innerHTML = escapeHTML(name);
         }
         const scoreTd = document.createElement('td');
         scoreTd.className = 'score';
-        scoreTd.textContent = r.score;
+        scoreTd.textContent = item.score;
         tr.append(pos, nameTd, scoreTd);
         tbody.appendChild(tr);
       });
@@ -41,7 +51,6 @@ async function loadLeaderboard(limit = 100, offset = 0) {
       empty.style.display = 'block';
     }
   } catch (e) {
-    console.error('loadLeaderboard error', e);
     empty.textContent = 'Не удалось загрузить рекорды';
     empty.style.display = 'block';
   } finally {
@@ -50,6 +59,7 @@ async function loadLeaderboard(limit = 100, offset = 0) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('apiBase').textContent = API_BASE;
-  loadLeaderboard();
+  const lastKnownScore = localStorage.getItem('lastKnownScore');
+  submitScore(lastKnownScore ?? 0);
+  renderBoard();
 });
