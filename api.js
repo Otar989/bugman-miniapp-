@@ -31,7 +31,7 @@ async function verifyInitData(initData) {
 export async function submitScore(score) {
   const initData = Telegram?.WebApp?.initData || "";
   if (!initData) {
-    toast("Откройте игру внутри Telegram");
+    toast("Откройте игру из Telegram");
     return;
   }
   await verifyInitData(initData);
@@ -39,9 +39,9 @@ export async function submitScore(score) {
   if (now - lastSubmitAt < 2000) return;
   lastSubmitAt = now;
   try {
+    // send raw initData without any encoding or manipulation
     const res = await fetch(`${API_BASE}/score`, {
       method: "POST",
-      mode: "cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ initData, score: Number(score) || 0 })
     });
