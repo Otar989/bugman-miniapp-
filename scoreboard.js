@@ -1,5 +1,5 @@
 import { API_BASE } from "./config.js";
-import { submitScore, toast } from "./api.js";
+import { toast } from "./api.js";
 
 const tbody = document.getElementById('records');
 const table = document.getElementById('recordsTable');
@@ -61,17 +61,9 @@ export async function loadLeaderboard(limit = 100, offset = 0) {
     loading.style.display = 'none';
   }
 }
-
-let submitted = false;
-function ensurePlayer() {
-  if (submitted) return;
-  submitted = true;
-  const lastKnownScore = localStorage.getItem('lastKnownScore');
-  submitScore(lastKnownScore ?? 0);
-}
+window.loadLeaderboard = loadLeaderboard;
 
 document.addEventListener('DOMContentLoaded', () => {
-  ensurePlayer();
   loadLeaderboard();
 });
 

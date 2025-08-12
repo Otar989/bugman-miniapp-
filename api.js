@@ -36,7 +36,7 @@ export async function submitScore(score) {
   }
   await verifyInitData(initData);
   const now = Date.now();
-  if (now - lastSubmitAt < 2000) return;
+  if (now - lastSubmitAt < 5000) return;
   lastSubmitAt = now;
   try {
     // send raw initData without any encoding or manipulation
@@ -46,11 +46,16 @@ export async function submitScore(score) {
       body: JSON.stringify({ initData, score: Number(score) || 0 })
     });
     const data = await res.json();
+    if (res.status === 429 || data?.error === "rate_limited") {
+      window.loadLeaderboard?.();
+      return;
+    }
     if (!res.ok || data?.ok === false) {
       const reason = data?.reason || data?.error || `HTTP ${res.status}`;
       toast(`Не удалось сохранить: ${reason}`);
       return;
     }
+    window.loadLeaderboard?.();
     // toast("Очки сохранены");
   } catch (e) {
     toast("Не удалось сохранить: сеть/сервер");
