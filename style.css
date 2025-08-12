@@ -53,6 +53,8 @@ h1{margin:0;font-size:16px;font-weight:800;letter-spacing:.6px}
 }
 
 #game{
+  position:relative;
+  z-index:0;
   display:block;
   image-rendering:pixelated;
   image-rendering:crisp-edges;
@@ -81,12 +83,26 @@ footer{
 
 .align-left { right:auto; left:8px; }
 
-/* стартовая плашка */
-.start{position:fixed;inset:0;display:grid;place-items:center;
-  background:rgba(3,6,14,.65);backdrop-filter:blur(2px);z-index:9}
-.card{background:rgba(12,22,52,.96);border:1px solid #244;
-  box-shadow:0 20px 60px rgba(0,0,0,.5);border-radius:18px;
-  padding:20px;max-width:460px;text-align:center}
+/* стартовая модалка */
+#gate{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  z-index:10;
+  pointer-events:auto;
+  background:rgba(3,6,14,.65);
+  backdrop-filter:blur(2px);
+}
+#gate[hidden]{display:none;pointer-events:none;}
+.gate-card{
+  background:rgba(12,22,52,.96);
+  border:1px solid #244;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  border-radius:18px;
+  padding:20px;max-width:460px;
+  text-align:center;
+}
 .title{font-weight:900;font-size:20px;margin:0 0 6px}
 .sub{color:#a9b9df;margin:0 0 14px}
   .btn{appearance:none;border:1px solid #1b2c56;background:#0b1430;color:var(--text);
