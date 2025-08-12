@@ -19,7 +19,7 @@ html,body{
 
 .app{
   display:grid;
-  grid-template-rows:auto 1fr auto auto;
+  grid-template-rows:auto 1fr;
   min-height:var(--vh);
   padding-top:calc(var(--safe-top) + 12px);         /* отступ под вырез/хедер */
   padding-right:calc(var(--safe-right) + 8px);      /* чтобы не пряталось под … */
@@ -62,11 +62,6 @@ canvas{
   overscroll-behavior:none;
 }
 
-.legend{padding:0 14px 14px;color:var(--muted);text-align:center;font-size:12px}
-footer{
-  padding:10px 14px;
-  color:#8aa0c6;text-align:center;font-size:12px
-}
 
 .dropdown, .modal {
   top: calc(var(--safe-top) + 8px) !important;
