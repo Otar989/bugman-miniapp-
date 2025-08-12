@@ -1,8 +1,8 @@
 const assert = require('assert');
 
-function stubCtx(){
-  return { setTransform:()=>{} };
-}
+  function stubCtx(){
+    return { setTransform:()=>{}, clearRect:()=>{} };
+  }
 function stubEl(){
   return {
       getContext: ()=>stubCtx(),
