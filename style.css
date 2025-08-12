@@ -4,69 +4,65 @@
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --vh: 100dvh; /* будет заменено скриптом в Telegram */
 }
 *{box-sizing:border-box}
 
-html, body, #app{ height:100%; margin:0; }
-body{
-  overflow:hidden;
+/* базовая разметка */
+html,body{
+  height:100%;
+  margin:0;
   background:radial-gradient(1200px 500px at 70% -10%, #14264d 0%, #0a1124 55%, #070b16 100%);
   color:var(--text);
   font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
 }
 
-#app{
-  display:flex;
-  flex-direction:column;
-  min-height:100dvh;
-  height:100dvh;
+.app{
+  display:grid;
+  grid-template-rows:auto 1fr auto auto;
+  min-height:var(--vh);
+  padding-top:calc(var(--safe-top) + 12px);         /* отступ под вырез/хедер */
+  padding-right:calc(var(--safe-right) + 8px);      /* чтобы не пряталось под … */
+  padding-bottom:calc(var(--safe-bottom) + 8px);
   overscroll-behavior:none;
 }
-@supports not (height:100dvh){
-  #app{height:100vh;}
-}
 
-#hud{
-  flex:0 0 auto;
-  display:flex;flex-wrap:wrap;align-items:center;gap:14px;
-  padding:clamp(6px,1.2vh,12px) clamp(8px,2vw,16px);
-  padding-top:calc(clamp(6px,1.2vh,12px) + var(--safe-top));
+header{
+  display:flex;gap:14px;align-items:center;justify-content:space-between;
+  padding:10px 14px;
   background:linear-gradient(180deg,var(--panel),#0c1324);
-  border-bottom:1px solid #172344;
-  z-index:5;
+  border-bottom:1px solid #172344;position:sticky;top:0;z-index:5
 }
 .brand{display:flex;gap:10px;align-items:center}
 .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);
   box-shadow:0 0 18px 6px rgba(255,210,63,.6)}
 h1{margin:0;font-size:16px;font-weight:800;letter-spacing:.6px}
+
+.hud{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.top-bar, .hud {
+  margin-top: 0;
+  inset-inline-end: 0;
+  translate: 0 0;
+}
 .chip{background:#0b1430;border:1px solid #1b2c56;border-radius:999px;
   padding:6px 10px;display:flex;align-items:center;gap:8px;font-weight:700}
 .chip .dot{width:8px;height:8px;border-radius:50%;background:#2b3f72}
 
-#stage{
-  position:relative;
-  flex:1 1 auto;
-  padding-bottom:var(--safe-bottom);
-  display:grid;
-  place-items:center;
-  overflow:hidden;
-}
-
-#game{
-  position:relative;
-  z-index:0;
-  display:block;
-  image-rendering:pixelated;
-  image-rendering:crisp-edges;
-  max-width:100%;
-  max-height:100%;
+#game{display:grid;place-items:center;padding:10px}
+canvas{
+  width:min(96vw, 920px);
+  height:auto;
+  aspect-ratio: 28 / 31; /* ровно как сетка */
+  max-height:min(78vh, calc(var(--vh) - 170px));
   background:#020817;border-radius:18px;
   box-shadow:0 12px 40px rgba(0,0,0,.45), inset 0 0 0 3px #0e1a36;
   outline:none;
-  touch-action:none;
+
+  touch-action:none;           /* все жесты — в игру */
   overscroll-behavior:none;
 }
 
+.legend{padding:0 14px 14px;color:var(--muted);text-align:center;font-size:12px}
 footer{
   padding:10px 14px;
   color:#8aa0c6;text-align:center;font-size:12px
@@ -74,40 +70,23 @@ footer{
 
 .dropdown, .modal {
   top: calc(var(--safe-top) + 8px) !important;
-  max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 16px);
+  max-height: calc(var(--vh) - var(--safe-top) - var(--safe-bottom) - 16px);
   overflow:auto;
-}
-@supports not (height:100dvh){
-  .dropdown, .modal{max-height:calc(100vh - var(--safe-top) - var(--safe-bottom) - 16px);}
 }
 
 .align-left { right:auto; left:8px; }
 
-/* стартовая модалка */
-#gate{
-  position:absolute;
-  inset:0;
-  display:grid;
-  place-items:center;
-  z-index:2147483647;
-  pointer-events:auto;
-  background:rgba(3,6,14,.65);
-  backdrop-filter:blur(2px);
-}
-#gate[hidden]{display:none;pointer-events:none;}
-.gate-card{
-  background:rgba(12,22,52,.96);
-  border:1px solid #244;
-  box-shadow:0 20px 60px rgba(0,0,0,.5);
-  border-radius:18px;
-  padding:20px;max-width:460px;
-  text-align:center;
-}
+/* стартовая плашка */
+.start{position:fixed;inset:0;display:grid;place-items:center;
+  background:rgba(3,6,14,.65);backdrop-filter:blur(2px);z-index:9}
+.card{background:rgba(12,22,52,.96);border:1px solid #244;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);border-radius:18px;
+  padding:20px;max-width:460px;text-align:center}
 .title{font-weight:900;font-size:20px;margin:0 0 6px}
 .sub{color:#a9b9df;margin:0 0 14px}
-  .btn{appearance:none;border:1px solid #1b2c56;background:#0b1430;color:var(--text);
-    padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.2s;
-    box-shadow:0 6px 16px rgba(0,0,0,.25);font-size:clamp(12px,1.6vh,16px)}
+.btn{appearance:none;border:1px solid #1b2c56;background:#0b1430;color:var(--text);
+  padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.2s;
+  box-shadow:0 6px 16px rgba(0,0,0,.25)}
 .btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.35)}
 
 /* таблица рекордов */

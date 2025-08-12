@@ -5,48 +5,53 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Bugman</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=rev-b443607">
 </head>
 <body>
-<div id="app">
-  <header id="hud">
+<div class="app">
+  <header>
     <div class="brand"><div class="dot"></div><h1>Bugman</h1></div>
-    <div class="chip"><span class="dot"></span> Очки: <span id="score">0</span></div>
-    <div class="chip"><span class="dot"></span> Уровень: <span id="level">1</span></div>
-    <div class="chip"><span class="dot"></span> Жизни: <span id="lives">3</span></div>
-    <button id="btnPause"   class="btn">Пауза ⏸</button>
-    <button id="btnRestart" class="btn">Заново ↻</button>
-    <button id="btnSound"   class="btn">Звук 🔊</button>
-    <button id="btnMusic"   class="btn">Мелодия ♫</button>
-    <a href="scoreboard.html" class="btn">Рекорды 🏆</a>
+    <div class="hud">
+      <div class="chip"><span class="dot"></span> Очки: <span id="score">0</span></div>
+      <div class="chip"><span class="dot"></span> Уровень: <span id="level">1</span></div>
+      <div class="chip"><span class="dot"></span> Жизни: <span id="lives">3</span></div>
+      <button id="btnPause"   class="btn">Пауза ⏸</button>
+      <button id="btnRestart" class="btn">Заново ↻</button>
+      <button id="btnSound"   class="btn">Звук 🔊</button>
+      <button id="btnMusic"   class="btn">Мелодия ♫</button>
+      <a href="scoreboard.html" class="btn">Рекорды 🏆</a>
+    </div>
   </header>
 
-  <main id="stage">
-    <canvas id="game" tabindex="0" aria-label="Игровое поле Bugman"></canvas>
-
-    <!-- модалка старта -->
-    <div id="gate">
-      <div class="gate-card">
-        <p class="title">Нажми «Начать»</p>
-        <p class="sub">Активируются звук/музыка и управление. Или просто нажми Enter.</p>
-        <button id="btnStart" class="btn" type="button">Начать ▶</button>
-      </div>
-    </div>
+  <main id="game">
+    <canvas id="canvas" width="672" height="744" tabindex="0" aria-label="Игровое поле Bugman"></canvas>
   </main>
+
+  <div class="legend">Стрелки / WASD, свайпы (включая тачпад). Выход за край — вход с противоположного края.</div>
+  <footer>© 2025 — Bugman.</footer>
+</div>
+
+<!-- стартовая плашка -->
+<div class="start" id="start">
+  <div class="card">
+    <p class="title">Нажми «Начать»</p>
+    <p class="sub">Активируются звук/музыка и управление. Или просто нажми Enter.</p>
+    <button id="btnStart" class="btn">Начать ▶</button>
+  </div>
 </div>
 
 <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="init.js"></script>
-  <script type="module" src="config.js"></script>
+  <script src="init.js?v=rev-b443607"></script>
+  <script type="module" src="config.js?v=rev-b443607"></script>
 
   <!-- Игра -->
-  <script src="./game.js"></script>
+  <script src="./game.js?v=rev-b443607"></script>
 
 <!-- Доп. блокировка системных жестов в области игры -->
 <script>
 (function(){
-  const canvas = document.getElementById('game');
+  const canvas = document.getElementById('canvas');
   const stopIfCanvas = (e)=>{
     if (e.target === canvas || canvas.contains(e.target)) {
       e.preventDefault();

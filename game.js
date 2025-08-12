@@ -1,65 +1,24 @@
 /* Bugman — core */
 
-const tg = window.Telegram?.WebApp;
-let DPR = Math.max(1, Math.floor(window.devicePixelRatio || 1));
-const COLS = 28, ROWS = 31;
-const app = document.getElementById('app');
-const stage = document.getElementById('stage');
-const canvas = document.getElementById('game');
+const ENABLE_NEW_ADAPTIVE = false;
+const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d', { alpha:false });
-let TILE = 24;
 
-function getViewportHeight(){
-  if (tg && tg.viewportStableHeight) return tg.viewportStableHeight;
-  return window.innerHeight;
-}
+// ===== Canvas / DPR
+let DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+const TILE = 24, COLS = 28, ROWS = 31;
 
-function layout(){
-  const hud = document.getElementById('hud');
-  const appW = app.clientWidth;
-  const appH = getViewportHeight();
-  const hudH = hud?.offsetHeight || 0;
-
-  const stageW = appW;
-  const stageH = appH - hudH;
-
-  const tileW = Math.floor(stageW / COLS);
-  const tileH = Math.floor(stageH / ROWS);
-  const tile = Math.max(1, Math.min(tileW, tileH));
-
-  const drawW = tile * COLS;
-  const drawH = tile * ROWS;
-
-  DPR = Math.max(1, Math.floor(window.devicePixelRatio || 1));
-
-  canvas.width  = drawW * DPR;
-  canvas.height = drawH * DPR;
-  canvas.style.width  = `${drawW}px`;
-  canvas.style.height = `${drawH}px`;
-
+function fitCanvas(){
+  DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  const w = COLS*TILE, h = ROWS*TILE;
+  canvas.width  = Math.round(w * DPR);
+  canvas.height = Math.round(h * DPR);
+  canvas.style.aspectRatio = `${w}/${h}`;
   ctx.setTransform(DPR,0,0,DPR,0,0);
-
-  stage.style.gridTemplateColumns = `${drawW}px`;
-  stage.style.gridTemplateRows = `${drawH}px`;
-
-  TILE = tile;
-
-  if (typeof ctx.clearRect === 'function' && typeof ctx.createLinearGradient === 'function') draw();
 }
-
-let raf;
-function safeLayout(){
-  const rAF = globalThis.requestAnimationFrame || setTimeout;
-  const cAF = globalThis.cancelAnimationFrame || clearTimeout;
-  cAF(raf);
-  raf = rAF(layout);
-}
-
-window.addEventListener('resize', safeLayout);
-window.addEventListener('orientationchange', () => setTimeout(safeLayout,50));
-if (tg) tg.onEvent('viewportChanged', safeLayout);
-
-safeLayout();
+fitCanvas();
+addEventListener('resize', fitCanvas);
+globalThis.Telegram?.WebApp?.onEvent?.('viewportChanged', fitCanvas);
 
 // ===== Audio (минимум, чтобы не падало без жеста)
 let audioCtx, master, sfxGain, musicGain, musicTimer=null, musicOn=false, melodyIndex=0, audioEnabled=true;
@@ -299,6 +258,17 @@ addEventListener('keydown', (e)=>{
     document.getElementById('btnPause').click();
     e.preventDefault();
   }
+  else if (e.key==='Enter'){
+    if (!startHidden()){
+      if (gameOver){
+        hideStartOverlay();
+        restart();
+      } else {
+        startGame();
+      }
+    } else restart();
+    e.preventDefault();
+  }
 }, {passive:false});
 
 // свайпы: палец и тачпад
@@ -325,9 +295,9 @@ const btnRestart = document.getElementById('btnRestart');
 const btnSound   = document.getElementById('btnSound');
 const btnMusic   = document.getElementById('btnMusic');
 const btnStart   = document.getElementById('btnStart');
-const gate       = document.getElementById('gate');
-const startTitle = gate.querySelector('.title');
-const startSub   = gate.querySelector('.sub');
+const startEl    = document.getElementById('start');
+const startTitle = startEl.querySelector('.title');
+const startSub   = startEl.querySelector('.sub');
 const startDefaults = {
   title: startTitle.textContent,
   sub: startSub.textContent,
@@ -378,19 +348,26 @@ function hideStartOverlay(){
   startTitle.textContent = startDefaults.title;
   startSub.textContent   = startDefaults.sub;
   btnStart.textContent   = startDefaults.btn;
-  gate.hidden = true;
+  startEl.style.display  = 'none';
 }
 
 function showGameOver(){
   startTitle.textContent = 'Жизни закончились';
   startSub.textContent   = 'Нажми «Заново», чтобы начать сначала';
   btnStart.textContent   = 'Заново ↻';
-  gate.hidden = false;
+  startEl.style.display  = 'grid';
 }
 
-// Если TG меняет высоту/ориентацию — не возвращаем модалку случайно
-tg?.onEvent?.('viewportChanged', () => {});
+btnStart.onclick = () => {
+  if (gameOver){
+    hideStartOverlay();
+    restart();
+  } else {
+    startGame();
+  }
+};
 
+function startHidden(){ return startEl.style.display==='none'; }
 function startGame(){
   ensureAudio(); audioCtx.resume?.();
   hideStartOverlay();
@@ -417,54 +394,6 @@ function restart(){
   if (loopHandle){ cancelAnimationFrame(loopHandle); loopHandle=null; }
   loop();
 }
-
-// Старт игры по кнопке/Enter/Telegram MainButton
-(()=> {
-  const tg = window.Telegram?.WebApp;
-
-  async function unlockAudio(){
-    try { if (window.Howler?.ctx?.state === 'suspended') await Howler.ctx.resume(); } catch {}
-    try {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (AC) {
-        window._actx = window._actx || new AC();
-        if (window._actx.state === 'suspended') await window._actx.resume();
-      }
-    } catch {}
-    try { ensureAudio(); if (audioCtx?.state === 'suspended') await audioCtx.resume(); } catch {}
-  }
-
-  async function startHandler(){
-    if (gate.hidden) return;
-    gate.setAttribute('hidden','');
-    await unlockAudio();
-    if (gameOver) restart(); else startGame();
-  }
-
-  function wireStart(){
-    const btn = document.getElementById('btnStart');
-    btn?.addEventListener('click', e => { e.preventDefault(); startHandler(); }, { once:true });
-  }
-
-  document.addEventListener('click', e => {
-    if (!gate.hidden && e.target.closest('#btnStart')) {
-      e.preventDefault(); startHandler();
-    }
-  });
-
-  document.addEventListener('keydown', e => {
-    if ((e.key === 'Enter' || e.code === 'Enter') && !gate.hidden) {
-      e.preventDefault(); startHandler();
-    }
-  });
-
-  tg?.onEvent?.('mainButtonClicked', startHandler);
-
-  if (document.readyState === 'loading')
-    document.addEventListener('DOMContentLoaded', wireStart, { once:true });
-  else
-    wireStart();
-})();
 
 // ===== Движок тайлов
 function tileAt(x,y){ // x,y — целые клетки
