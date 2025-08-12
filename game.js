@@ -300,14 +300,8 @@ addEventListener('keydown', (e)=>{
     e.preventDefault();
   }
   else if (e.key==='Enter'){
-    if (!startHidden()){
-      if (gameOver){
-        hideStartOverlay();
-        restart();
-      } else {
-        startGame();
-      }
-    } else restart();
+    if (!startHidden()) btnStart.click();
+    else restart();
     e.preventDefault();
   }
 }, {passive:false});
@@ -336,9 +330,9 @@ const btnRestart = document.getElementById('btnRestart');
 const btnSound   = document.getElementById('btnSound');
 const btnMusic   = document.getElementById('btnMusic');
 const btnStart   = document.getElementById('btnStart');
-const startEl    = document.getElementById('start');
-const startTitle = startEl.querySelector('.title');
-const startSub   = startEl.querySelector('.sub');
+const gate       = document.getElementById('gate');
+const startTitle = gate.querySelector('.title');
+const startSub   = gate.querySelector('.sub');
 const startDefaults = {
   title: startTitle.textContent,
   sub: startSub.textContent,
@@ -389,26 +383,33 @@ function hideStartOverlay(){
   startTitle.textContent = startDefaults.title;
   startSub.textContent   = startDefaults.sub;
   btnStart.textContent   = startDefaults.btn;
-  startEl.style.display  = 'none';
+  gate.hidden = true;
 }
 
 function showGameOver(){
   startTitle.textContent = 'Жизни закончились';
   startSub.textContent   = 'Нажми «Заново», чтобы начать сначала';
   btnStart.textContent   = 'Заново ↻';
-  startEl.style.display  = 'grid';
+  gate.hidden = false;
 }
 
-btnStart.onclick = () => {
-  if (gameOver){
-    hideStartOverlay();
-    restart();
-  } else {
-    startGame();
-  }
-};
+btnStart.addEventListener('click', (e) => {
+  e.preventDefault();
+  ensureAudio(); audioCtx.resume?.();
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (gameOver){
+      hideStartOverlay();
+      restart();
+    } else {
+      startGame();
+    }
+  }));
+});
 
-function startHidden(){ return startEl.style.display==='none'; }
+// Если TG меняет высоту/ориентацию — не возвращаем модалку случайно
+tg?.onEvent?.('viewportChanged', () => {});
+
+function startHidden(){ return gate.hidden; }
 function startGame(){
   ensureAudio(); audioCtx.resume?.();
   hideStartOverlay();
